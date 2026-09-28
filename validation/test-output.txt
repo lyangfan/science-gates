@@ -17,6 +17,8 @@ test_existing_digests_do_not_read_contents (test_science_skill.PrepareTests.test
 test_fills_only_null_and_deduplicates_actual_reads (test_science_skill.PrepareTests.test_fills_only_null_and_deduplicates_actual_reads) ... ok
 test_placeholder_strings_rejected (test_science_skill.PrepareTests.test_placeholder_strings_rejected) ... ok
 test_approved_image_is_embedded_without_network (test_science_skill.ReportTests.test_approved_image_is_embedded_without_network) ... ok
+test_changed_original_run_record_fails_identity (test_science_skill.ReportTests.test_changed_original_run_record_fails_identity) ... ok
+test_completed_analysis_requires_production_sources (test_science_skill.ReportTests.test_completed_analysis_requires_production_sources) ... ok
 test_conclusion_without_evidence_fails (test_science_skill.ReportTests.test_conclusion_without_evidence_fails) ... ok
 test_duplicate_analysis_does_not_satisfy_count (test_science_skill.ReportTests.test_duplicate_analysis_does_not_satisfy_count) ... ok
 test_duplicate_headers_fail (test_science_skill.ReportTests.test_duplicate_headers_fail) ... ok
@@ -37,15 +39,20 @@ test_missing_source_keys_fail (test_science_skill.ReportTests.test_missing_sourc
 test_negative_values_are_drawn_around_zero (test_science_skill.ReportTests.test_negative_values_are_drawn_around_zero) ... ok
 test_nonfinite_plot_fails (test_science_skill.ReportTests.test_nonfinite_plot_fails) ... ok
 test_offline_html_contains_actual_numbers_and_all_data (test_science_skill.ReportTests.test_offline_html_contains_actual_numbers_and_all_data) ... ok
+test_partial_report_can_disclose_missing_historical_record (test_science_skill.ReportTests.test_partial_report_can_disclose_missing_historical_record) ... ok
 test_ragged_rows_fail (test_science_skill.ReportTests.test_ragged_rows_fail) ... ok
 test_reference_cannot_escape_project (test_science_skill.ReportTests.test_reference_cannot_escape_project) ... ok
 test_render_refuses_to_overwrite_html (test_science_skill.ReportTests.test_render_refuses_to_overwrite_html) ... ok
+test_report_never_executes_displayed_command (test_science_skill.ReportTests.test_report_never_executes_displayed_command) ... ok
+test_report_total_budget_precedes_source_reads (test_science_skill.ReportTests.test_report_total_budget_precedes_source_reads) ... ok
 test_scatter_uses_numeric_axes (test_science_skill.ReportTests.test_scatter_uses_numeric_axes) ... ok
 test_source_digest_cannot_be_replaced_silently (test_science_skill.ReportTests.test_source_digest_cannot_be_replaced_silently) ... ok
+test_table_cannot_impersonate_code_source (test_science_skill.ReportTests.test_table_cannot_impersonate_code_source) ... ok
 test_template_tokens_in_user_text_are_not_expanded (test_science_skill.ReportTests.test_template_tokens_in_user_text_are_not_expanded) ... ok
 test_unexecuted_analysis_cannot_claim_observed_results (test_science_skill.ReportTests.test_unexecuted_analysis_cannot_claim_observed_results) ... ok
 test_unexecuted_analysis_is_visible_but_not_scientific_pass (test_science_skill.ReportTests.test_unexecuted_analysis_is_visible_but_not_scientific_pass) ... ok
 test_unknown_metric_column_fails (test_science_skill.ReportTests.test_unknown_metric_column_fails) ... ok
+test_unknown_production_record_rejected (test_science_skill.ReportTests.test_unknown_production_record_rejected) ... ok
 test_unsupported_conclusion_reference_fails (test_science_skill.ReportTests.test_unsupported_conclusion_reference_fails) ... ok
 test_wrong_spec_identity_fails (test_science_skill.ReportTests.test_wrong_spec_identity_fails) ... ok
 test_editing_page_and_updating_manifest_hash_does_not_pass (test_science_skill.WorkflowIntegrationTests.test_editing_page_and_updating_manifest_hash_does_not_pass) ... ok
@@ -55,6 +62,7 @@ test_gate_a_contract_has_report_policy_without_granting_science_pass (test_scien
 test_missing_report_requirements_rejected (test_science_skill.WorkflowIntegrationTests.test_missing_report_requirements_rejected) ... ok
 test_no_independent_report_cannot_record (test_science_skill.WorkflowIntegrationTests.test_no_independent_report_cannot_record) ... ok
 test_real_cli_from_unrelated_cwd_and_space_path (test_science_skill.WorkflowIntegrationTests.test_real_cli_from_unrelated_cwd_and_space_path) ... ok
+test_report_check_cannot_claim_scientific_rerun (test_science_skill.WorkflowIntegrationTests.test_report_check_cannot_claim_scientific_rerun) ... ok
 test_report_source_must_be_in_manifest_before_read (test_science_skill.WorkflowIntegrationTests.test_report_source_must_be_in_manifest_before_read) ... ok
 test_unauthorized_final_na_rejected (test_science_skill.WorkflowIntegrationTests.test_unauthorized_final_na_rejected) ... ok
 test_valid_report_policy_and_content (test_science_skill.WorkflowIntegrationTests.test_valid_report_policy_and_content) ... ok
@@ -90,6 +98,11 @@ test_write_and_compare_content (test_snapshots.SnapshotTests.test_write_and_comp
 test_later_batch_error_cannot_return_partial_success (test_verify_digests.RemoteBatchTests.test_later_batch_error_cannot_return_partial_success) ... ok
 test_long_unicode_paths_preserve_every_input_and_bound_requests (test_verify_digests.RemoteBatchTests.test_long_unicode_paths_preserve_every_input_and_bound_requests) ... ok
 test_missing_file_does_not_drop_later_batches (test_verify_digests.RemoteBatchTests.test_missing_file_does_not_drop_later_batches) ... ok
+test_file_growth_stops_at_budget_plus_one (test_verify_digests.ReviewBudgetTests.test_file_growth_stops_at_budget_plus_one) ... ok
+test_git_blob_size_checked_before_content_with_either_budget (test_verify_digests.ReviewBudgetTests.test_git_blob_size_checked_before_content_with_either_budget) ... ok
+test_oversized_file_fails_before_open (test_verify_digests.ReviewBudgetTests.test_oversized_file_fails_before_open) ... ok
+test_remote_ref_fails_before_local_content_or_ssh (test_verify_digests.ReviewBudgetTests.test_remote_ref_fails_before_local_content_or_ssh) ... ok
+test_total_budget_counts_unique_reads (test_verify_digests.ReviewBudgetTests.test_total_budget_counts_unique_reads) ... ok
 test_changed_plan_bytes_are_rejected_before_interpreting_its_target (test_verify_digests.VerifyDigestsTests.test_changed_plan_bytes_are_rejected_before_interpreting_its_target) ... ok
 test_claimed_change_absent_from_diff_stops_before_snapshot_target (test_verify_digests.VerifyDigestsTests.test_claimed_change_absent_from_diff_stops_before_snapshot_target) ... ok
 test_commit_rejects_symbolic_short_and_noncommit_objects (test_verify_digests.VerifyDigestsTests.test_commit_rejects_symbolic_short_and_noncommit_objects) ... ok
@@ -180,6 +193,11 @@ test_remote_alias_uncertainty_is_not_silently_accepted (test_workflow.WorkflowTe
 test_remote_forbidden_tree_stops_before_any_ssh_or_hash (test_workflow.WorkflowTests.test_remote_forbidden_tree_stops_before_any_ssh_or_hash) ... ok
 test_repair_requires_full_earlier_round_prefix (test_workflow.WorkflowTests.test_repair_requires_full_earlier_round_prefix) ... ok
 test_result_record_refuses_deferred_required_check (test_workflow.WorkflowTests.test_result_record_refuses_deferred_required_check) ... ok
+test_review_aggregate_budget_rejected_before_hash (test_workflow.WorkflowTests.test_review_aggregate_budget_rejected_before_hash) ... ok
+test_review_content_snapshot_rejected_before_hash_or_walk (test_workflow.WorkflowTests.test_review_content_snapshot_rejected_before_hash_or_walk) ... ok
+test_review_large_file_rejected_before_hash (test_workflow.WorkflowTests.test_review_large_file_rejected_before_hash) ... ok
+test_review_metadata_snapshot_never_opens_target_content (test_workflow.WorkflowTests.test_review_metadata_snapshot_never_opens_target_content) ... ok
+test_review_remote_content_rejected_before_ssh (test_workflow.WorkflowTests.test_review_remote_content_rejected_before_ssh) ... ok
 test_run_cannot_succeed_after_changing_an_input (test_workflow.WorkflowTests.test_run_cannot_succeed_after_changing_an_input) ... ok
 test_run_creates_declared_output_and_receipt (test_workflow.WorkflowTests.test_run_creates_declared_output_and_receipt) ... ok
 test_snapshot_forbidden_descendant_stops_before_hash_or_walk (test_workflow.WorkflowTests.test_snapshot_forbidden_descendant_stops_before_hash_or_walk) ... ok
@@ -193,7 +211,7 @@ test_unknown_keys_and_duplicate_json_keys_fail (test_workflow.WorkflowTests.test
 test_valid_manifest_uses_digest_backend_for_explicit_content (test_workflow.WorkflowTests.test_valid_manifest_uses_digest_backend_for_explicit_content) ... ok
 
 ----------------------------------------------------------------------
-Ran 193 tests in 6.297s
+Ran 211 tests in 7.647s
 
 OK
 {"receipt": "out/run1/receipt.json", "command_rc": 7, "status": "failed"}
@@ -202,4 +220,4 @@ OK
 {"receipt": "out/run1/receipt.json", "command_rc": 0, "status": "failed"}
 {"receipt": "out/run1/receipt.json", "command_rc": 0, "status": "complete"}
 {"receipt": "out/run1/receipt.json", "command_rc": 0, "status": "failed"}
-All suites passed in 6.370 seconds.
+All suites passed in 7.725 seconds.

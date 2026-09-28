@@ -8,7 +8,7 @@
 1. 门 A 固定的报告合同：schema 为 science-gates.report-contract.v1，包含 spec 的
    path/sha256，以及 analyses 数组。每项有 id/title/visualization；visualization 为
    required 或 not_applicable，后者必须给出 reason。ID 全集及顺序固定。
-2. 报告源：schema 为 science-gates.report.v1，顶层包含 title/overview/summary/spec/sources/analyses。
+2. 报告源：schema 为 science-gates.report.v2，顶层包含 title/overview/summary/spec/sources/analyses。
 3. 输出 HTML 及机械核验 JSON：由 report.py 生成，均作为门 B 受审产物保全。
 
 scripts/make_example.py 生成完整的合法示例和实算摘要。示例是接口样例，不是本项目的实验设计。
@@ -17,7 +17,7 @@ scripts/make_example.py 生成完整的合法示例和实算摘要。示例是�
 
 sources 每项有 id/path/sha256/format/label；format 支持 csv、tsv、text、png、jpeg。
 表格必须指定 keys 数组作为唯一行键，缺键、重复键、空表、重复表头和错位列均失败。
-路径为项目相对路径，单文件最大 8 MiB，表格最多 5000 行。
+路径为项目相对路径，单文件最大 8 MiB，源文件与控制材料合计最大 64 MiB，表格最多 5000 行。
 大型原始数据通过已经科学验收的小型结果表进入报告；脚本不扫描大目录。
 
 analyses 每项：
@@ -33,6 +33,27 @@ analyses 每项：
 | figures | 可用 bar/scatter/table/image；绑定实际数据或图片，提供 title/caption/alt |
 | conclusions | 每项 text/result_ids/source_ids；必须连接本节结果或证据来源 |
 | limitations | 非空字符串数组；明确推断、外部证据及泛化边界 |
+| provenance | completed 必填；引用已有代码、输入清单、实际命令和原始执行记录，格式如下 |
+
+provenance 只含四个非空字符串数组，引用同一份 sources，不新增证据数据库：
+
+~~~json
+{
+  "code_sources": ["analysis-code"],
+  "input_sources": ["input-manifest"],
+  "commands": ["python analysis.py --config config.json"],
+  "record_sources": ["original-run-record"]
+}
+~~~
+
+除 commands 外均为 sources 中的 ID；代码和记录使用 text，输入或其原清单使用 text/csv/tsv。
+commands 填实际执行命令；参数文件、种子及必要环境信息引用原代码/记录，不重新抄成另一份配置。
+大文件只登记原位置及当次输入清单，报告不读取本体、不重新算它们的 SHA256。
+报告以可折叠的“结果来源与执行记录”呈现这些引用；生成和核验都不会执行所展示的命令。
+原运行材料由执行方可写，不能冒充独立执行锚；Reviewer 核代码、命令、记录与结果是否相互吻合。
+
+这表示来源可追溯，不表示已独立复现。缺少历史记录时用 partial 和具体缺口，
+不要补造记录或重跑后冒称历史证据。旧 v1 报告保持原字节；采用 v2 时新建报告版本并补齐真实引用。
 
 where 为列名到精确字符串值的对象，result 必须包括全部唯一键并且恰好选中一行。
 figure 可以省略 where；省略时展示源表全部行，不静默抽样。
@@ -69,10 +90,10 @@ present 的 authority 或 dependency。门 A 合同包含 A1–A6。
 |---|---|
 | RPT-COVERAGE | 对照 spec 核完整分析范围和结果维度；缺结果仍显式呈现 |
 | RPT-METHODS | 目的、实际方法、样本、排除、分母与执行相符 |
-| RPT-RESULTS | 数字、方向、单位、不确定性与独立复算结果相符 |
+| RPT-RESULTS | 数字、方向、单位、不确定性与已有结果及实际方法相符；不默认重算统计 |
 | RPT-VISUALS | 图表绑定正确、轴和图例合理、浏览器中可读 |
 | RPT-CONCLUSIONS | 结论强度有支持；无把缺证据说成无效应或无报道 |
-| RPT-PROVENANCE | spec、版本、实际表格和外部原文可定位 |
+| RPT-PROVENANCE | spec、代码、输入清单、实际命令、原始运行记录、结果表与引用原文可定位且对应；明确未独立重算的边界 |
 
 六项均覆盖 c1/c2/c3，最终阶段不允许 NA/deferred；required_objects 包含以上三个对象，
 required_roles 包含 product 和 evidence。报告源及 HTML 使用 product，核验 JSON 使用 evidence。
@@ -98,6 +119,7 @@ python3 /absolute/path/to/science-gates/scripts/report.py check report-source.js
 
 目标父目录先按合同由唯一负责者创建；文件独占生成，不覆盖旧报告。
 check 会从固定报告源和来源表重建 HTML，与受审 HTML 逐字节比较，不能只核页面存在。
+这里只重建展示，不重算科学结果；核验 JSON 明示 scientific_rerun: false。
 模板版本也进入核验结果；模板变更需要重生成并复核受影响展示。
 science.py 在结果 check/record 中强制检查上述材料；通过后仍仅为 MECHANICAL_OK。
 

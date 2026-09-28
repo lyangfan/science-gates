@@ -75,7 +75,7 @@ def verify_report(ctx, policy):
     result = report.verify_html(selected["html_object"]["path"])
     evidence = selected["verification_object"]
     saved = w.parse(w.stable_read(ctx.root / evidence["path"], evidence["sha256"]))
-    for key in ("schema", "status", "scientific_pass", "source", "contract", "html", "template_sha256",
+    for key in ("schema", "status", "scientific_pass", "scientific_rerun", "source", "contract", "html", "template_sha256",
                 "analyses", "required_independent_checks"):
         w.require(saved.get(key) == result[key], "report verification evidence mismatch: " + key, 1)
     return result

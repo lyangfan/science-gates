@@ -33,11 +33,14 @@ def signature(s):
 
 class ContentCache:
     """仅本次调用缓存；元数据变化失效，不提供跨运行内容身份保证。"""
-    def __init__(self):
+    def __init__(self, *, max_file_bytes=None, max_total_bytes=None):
         self.values = {}
         self.snapshot_views = {}
         self.blobs = {}
         self.remote = {}
+        self.max_file_bytes = max_file_bytes
+        self.max_total_bytes = max_total_bytes
+        self.read_bytes = 0
         self.stats = {"content_files": 0, "content_bytes": 0, "cache_hits": 0,
                       "git_blobs": 0, "git_blob_bytes": 0}
 
@@ -52,12 +55,30 @@ class ContentCache:
         if key in self.values:
             self.stats["cache_hits"] += 1
             return self.values[key]
+        if self.max_file_bytes is not None and before.st_size > self.max_file_bytes:
+            raise RuntimeError(f"review file exceeds content budget: {path}")
+        if self.max_total_bytes is not None and self.read_bytes + before.st_size > self.max_total_bytes:
+            raise RuntimeError("review content exceeds total byte budget")
         h = hashlib.sha256()
         prefix = bytearray()
+        file_bytes = 0
         with open(path, "rb") as f:
             if signature(os.fstat(f.fileno())) != signature(before):
                 raise RuntimeError(f"读取前文件被替换：{path}")
-            for block in iter(lambda: f.read(1024 * 1024), b""):
+            while True:
+                remaining = [1024 * 1024]
+                if self.max_file_bytes is not None:
+                    remaining.append(self.max_file_bytes - file_bytes + 1)
+                if self.max_total_bytes is not None:
+                    remaining.append(self.max_total_bytes - self.read_bytes + 1)
+                block = f.read(min(remaining))
+                if not block:
+                    break
+                file_bytes += len(block)
+                self.read_bytes += len(block)
+                if (self.max_file_bytes is not None and file_bytes > self.max_file_bytes) or \
+                        (self.max_total_bytes is not None and self.read_bytes > self.max_total_bytes):
+                    raise RuntimeError("review content grew beyond byte budget during read")
                 h.update(block)
                 if len(prefix) < CONTROL_LIMIT + 1:
                     prefix.extend(block[:CONTROL_LIMIT + 1 - len(prefix)])
@@ -80,8 +101,20 @@ class ContentCache:
     def blob(self, root, commit, rel):
         key = (root, commit, rel)
         if key not in self.blobs:
+            if self.max_file_bytes is not None or self.max_total_bytes is not None:
+                size = subprocess.run(["git", "-C", root, "cat-file", "-s", f"{commit}:{rel}"],
+                                      capture_output=True, text=True, check=False)
+                if size.returncode != 0:
+                    self.blobs[key] = None
+                    self.stats["git_blobs"] += 1
+                    return None
+                amount = int(size.stdout.strip())
+                if (self.max_file_bytes is not None and amount > self.max_file_bytes) or \
+                        (self.max_total_bytes is not None and self.read_bytes + amount > self.max_total_bytes):
+                    raise RuntimeError("review Git blob exceeds content budget")
             out = subprocess.run(["git", "-C", root, "cat-file", "blob", f"{commit}:{rel}"],
                                  capture_output=True, check=False)
+            self.read_bytes += len(out.stdout)
             self.blobs[key] = hashlib.sha256(out.stdout).hexdigest() if out.returncode == 0 else None
             self.stats["git_blobs"] += 1
             self.stats["git_blob_bytes"] += len(out.stdout)
@@ -89,7 +122,11 @@ class ContentCache:
 
     def compute(self, paths):
         result, hosts = {}, {}
-        for path in dict.fromkeys(paths):
+        paths = list(dict.fromkeys(paths))
+        if (self.max_file_bytes is not None or self.max_total_bytes is not None) and \
+                any(table.split_remote(path)[0] is not None for path in paths):
+            raise RuntimeError("bounded review cannot read remote content; use saved small evidence")
+        for path in paths:
             host, p = table.split_remote(path)
             if host is None:
                 result[path] = self.local(p)

@@ -41,28 +41,28 @@
       "source": "tools/agent_gates_v2/test_verify_digests.py",
       "destination": "scripts/tests/test_verify_digests.py",
       "source_sha256": "64068722453dd798ee04cb39f6ac949e283b1d8cd226afce772f10c733792106",
-      "adaptation": "Relocated; imports and fixture names updated.",
+      "adaptation": "Relocated; imports and fixture names updated. Added bounded-read, growth, remote, and Git blob budget regressions.",
       "adapted": true
     },
     {
       "source": "tools/agent_gates_v2/verify_digests.py",
       "destination": "scripts/verify_digests.py",
       "source_sha256": "39df6e4338d4d12f22b95ae0d7277d5f2899b860bf4953bf77b0706a4d55e6e8",
-      "adaptation": "Relocated; imports shared digest_table directly instead of loading old entrypoint. Diagnostic prefix no longer includes implementation version.",
+      "adaptation": "Relocated; imports shared digest_table directly instead of loading old entrypoint. Diagnostic prefix no longer includes implementation version. Added per-call bounded review content reads and pre-read Git blob size checks; explicit digest CLI retains authorized production capability.",
       "adapted": true
     },
     {
       "source": "tools/agent_gates_v3/test_workflow.py",
       "destination": "scripts/tests/test_workflow.py",
       "source_sha256": "d4a7b21fa03598f5dd44c2420f1aa10d2fb1ca3e9313f3962b474f09af5d3ec9",
-      "adaptation": "Relocated; imports and backend loader name updated.",
+      "adaptation": "Relocated; imports and backend loader name updated. Added review cost guards; explicit production content-snapshot capability remains tested.",
       "adapted": true
     },
     {
       "source": "tools/agent_gates_v3/workflow.py",
       "destination": "scripts/workflow.py",
       "source_sha256": "6af2308ff49c2f1c4130d87da3b819774c9fd2eac05e26465797bdb78e77bc9c",
-      "adaptation": "Relocated; backend loader points at current sibling verify_digests.py. JSONL adapter and workflow contracts preserved.",
+      "adaptation": "Relocated; backend loader points at current sibling verify_digests.py. JSONL adapter and workflow contracts preserved. Added small-evidence review budgets and rejection of live content snapshot rescans during review.",
       "adapted": true
     },
     {
@@ -70,23 +70,23 @@
       "destination": "references/workflow-schema.md",
       "adapted": true,
       "source_sha256": "0dd2822f574f1e70f95f3660bcdb84f39cf6e3ff41ecc2bfa941e7b5d368af2e",
-      "adaptation": "Adapted reference documentation for the standalone SCI skill; current paths and versioning policy."
+      "adaptation": "Adapted reference documentation for the standalone SCI skill; current paths and versioning policy. Documents bounded review inputs and the distinction between historical evidence and strict live receipt validation."
     },
     {
       "source": "tools/agent_gates_v2/README.md",
       "destination": "references/digests-and-snapshots.md",
       "adapted": true,
       "source_sha256": "d55f8a931037ea2e896d9a233439af7d7b9fef3b0bb30dca9b28cc447ec4e7c4",
-      "adaptation": "Adapted reference documentation for the standalone SCI skill; current paths and versioning policy."
+      "adaptation": "Adapted reference documentation for the standalone SCI skill; current paths and versioning policy. Separates default review from explicitly authorized large content verification."
     },
     {
       "source": "docs/AGENT_GATE_PROTOCOL_SCI.md",
       "destination": "references/protocol.md",
       "adapted": true,
       "source_sha256": "d549e0758bcb02ba45511bbe641ad89a0711cdb6f9d084bf1521391bd5c75a7f",
-      "adaptation": "Adapted reference documentation for the standalone SCI skill; current paths and versioning policy."
+      "adaptation": "Adapted reference documentation for the standalone SCI skill; current paths and versioning policy. SCI v12 defaults to one scientific execution and independent review of existing code, run records and results; no automatic recalculation."
     }
   ],
-  "package_version": "1.0.1",
+  "package_version": "1.1.0",
   "note": "source_sha256 identifies the original project file at source_commit. Current destination bytes are bound by validation/summary.json. Only the current implementation is bundled; historical source versions remain in Git."
 }

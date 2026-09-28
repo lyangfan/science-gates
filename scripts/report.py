@@ -18,7 +18,7 @@ import time
 sys.dont_write_bytecode = True
 import workflow as w
 
-REPORT = "science-gates.report.v1"
+REPORT = "science-gates.report.v2"
 CONTRACT = "science-gates.report-contract.v1"
 CHECK_IDS = ("RPT-COVERAGE", "RPT-METHODS", "RPT-RESULTS", "RPT-VISUALS",
              "RPT-CONCLUSIONS", "RPT-PROVENANCE")
@@ -123,12 +123,20 @@ class Report:
             dom_ids.extend(aid + "-" + r["id"] for r in analysis["results"])
             dom_ids.extend(aid + "-" + f["id"] + "-title" for f in analysis["figures"] if f["kind"] in {"bar", "scatter"})
         w.require(len(dom_ids) == len(set(dom_ids)), "generated HTML anchors collide")
+        read_paths = source_paths | {w.safe_local(self.root, source_path),
+                                    w.safe_local(self.root, contract_path),
+                                    w.reference(self.root, m["spec"], "spec")}
+        sizes = [path.stat().st_size for path in read_paths]
+        w.require(all(size <= w.CONTROL_LIMIT for size in sizes), "report input exceeds 8 MiB")
+        w.require(sum(sizes) <= w.REVIEW_TOTAL_LIMIT, "report inputs exceed 64 MiB; use bounded reviewed materials")
         spec_raw = w.stable_read(w.reference(self.root, m["spec"], "spec"), m["spec"]["sha256"])
         self.stats["control_bytes"] = len(source_raw) + len(spec_raw)
         for sid, source in self.sources.items():
             raw = w.stable_read(w.safe_local(self.root, source["path"]), source["sha256"])
             self.stats["source_files"] += 1
             self.stats["source_bytes"] += len(raw)
+            w.require(self.stats["source_bytes"] + self.stats["control_bytes"] <= w.REVIEW_TOTAL_LIMIT,
+                      "report content grew beyond total byte budget")
             if source["format"] in {"png", "jpeg"}:
                 is_png = raw.startswith(b"\x89PNG\r\n\x1a\n") and raw.endswith(b"IEND\xaeB\x60\x82")
                 is_jpeg = raw.startswith(b"\xff\xd8") and raw.endswith(b"\xff\xd9")
@@ -185,7 +193,7 @@ class Report:
 
     def validate_analysis(self, a, rule):
         w.keys(a, ("id", "title", "status", "purpose", "methods", "sample", "results", "figures", "conclusions", "limitations"),
-               ("reason",))
+               ("reason", "provenance"))
         w.require(a["title"] == rule["title"], "analysis title differs from contract")
         w.require(a["status"] in STATES, "unknown analysis state")
         for field in ("purpose", "sample"):
@@ -199,6 +207,17 @@ class Report:
         if a["status"] == "completed":
             nonempty(a["results"], "completed results")
             nonempty(a["conclusions"], "completed conclusions")
+            w.require("provenance" in a, "completed analysis needs saved production provenance")
+        if "provenance" in a:
+            p = a["provenance"]
+            w.keys(p, ("code_sources", "input_sources", "commands", "record_sources"))
+            for field in ("code_sources", "input_sources", "commands", "record_sources"):
+                w.strings(p[field], "provenance " + field, nonempty=True)
+            for field in ("code_sources", "input_sources", "record_sources"):
+                for sid in p[field]:
+                    w.require(sid in self.sources, "provenance references unknown source: " + sid)
+                    allowed = {"text", "csv", "tsv"} if field == "input_sources" else {"text"}
+                    w.require(self.sources[sid]["format"] in allowed, "invalid provenance source format")
         if a["status"] == "not_executed":
             w.require(not a["results"] and not a["figures"] and not a["conclusions"], "not-executed analysis cannot claim observed results")
         if a["status"] != "not_executed" and rule["visualization"] == "required":
@@ -346,7 +365,22 @@ class Report:
                 parts.append("<p>" + esc(c["text"]) + ' <span class="evidence">依据：' + " · ".join(links) + "</span></p>")
             if not a["conclusions"]:
                 parts.append("<p>尚不能从现有材料建立本分析的科学结论。</p>")
-            parts.append('<h3>局限与适用边界</h3><ul>' + "".join("<li>" + esc(v) + "</li>" for v in a["limitations"]) + "</ul></section>")
+            parts.append('<h3>局限与适用边界</h3><ul>' + "".join("<li>" + esc(v) + "</li>" for v in a["limitations"]) + "</ul>")
+            if "provenance" in a:
+                p = a["provenance"]
+                rows = []
+                for field, label in (("code_sources", "生成代码"), ("input_sources", "输入或输入清单"),
+                                     ("record_sources", "实际执行记录")):
+                    links = ' · '.join(f'<a href="#source-{esc(sid)}">{esc(self.sources[sid]["label"])}</a>' for sid in p[field])
+                    rows.append(f'<dt>{label}</dt><dd>{links}</dd>')
+                commands = ''.join('<pre><code>' + esc(command) + '</code></pre>' for command in p["commands"])
+                # Keep commands as escaped text; rendering never executes them.
+                detail = ('<details class="production"><summary>结果来源与执行记录</summary><dl>' + ''.join(rows)
+                          + '<dt>记录的执行命令</dt><dd>' + commands + '</dd></dl>'
+                          + '<p class="evidence">这些引用用于核对已保存的生成材料。报告工具不执行命令，也不重新计算科学结果；'
+                          '材料齐全不代表已独立复现。</p></details>')
+                parts.append(detail)
+            parts.append('</section>')
             blocks.append("".join(parts))
         provenance = "<p>以下定位用于追溯，原始数据按项目权限在原位置保留。</p>"
         for sid, source in self.sources.items():
@@ -367,7 +401,8 @@ class Report:
         expected = self.render()
         w.require(actual == expected, "HTML differs from authenticated report source/template", 1)
         return {"schema": "science-gates.report-check.v1", "status": "MECHANICAL_OK",
-                "scientific_pass": False, "source": {"path": self.source_path, "sha256": self.source_sha},
+                "scientific_pass": False, "scientific_rerun": False,
+                "source": {"path": self.source_path, "sha256": self.source_sha},
                 "contract": {"path": self.contract_path, "sha256": self.contract_sha},
                 "html": {"path": path, "sha256": w.digest(actual)},
                 "template_sha256": w.digest(w.stable_read(TEMPLATE)),

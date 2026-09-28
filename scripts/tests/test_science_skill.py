@@ -53,6 +53,52 @@ class ReportFixture(unittest.TestCase):
 
 
 class ReportTests(ReportFixture):
+    def test_completed_analysis_requires_production_sources(self):
+        del self.model["analyses"][0]["provenance"]
+        with self.assertRaisesRegex(w.WorkflowError, "production provenance"):
+            self.instance()
+
+    def test_unknown_production_record_rejected(self):
+        self.model["analyses"][0]["provenance"]["record_sources"] = ["invented"]
+        with self.assertRaisesRegex(w.WorkflowError, "unknown source"):
+            self.instance()
+
+    def test_table_cannot_impersonate_code_source(self):
+        self.model["analyses"][0]["provenance"]["code_sources"] = ["summary"]
+        with self.assertRaisesRegex(w.WorkflowError, "source format"):
+            self.instance()
+
+    def test_changed_original_run_record_fails_identity(self):
+        (self.root / "reviews/generation.json").write_text('{"exit_code": 99}\n')
+        with self.assertRaisesRegex(w.WorkflowError, "SHA256 mismatch"):
+            self.instance()
+
+    def test_report_never_executes_displayed_command(self):
+        self.model["analyses"][0]["provenance"]["commands"] = ['python expensive.py > "result.csv"']
+        with mock.patch.object(subprocess, "run", side_effect=AssertionError("report executed command")):
+            instance = self.instance()
+            (self.root / "checked.html").write_bytes(instance.render())
+            result = instance.verify_html("checked.html")
+        self.assertFalse(result["scientific_rerun"])
+        output = (self.root / "checked.html").read_text()
+        self.assertIn("python expensive.py &gt; &quot;result.csv&quot;", output)
+        self.assertIn("材料齐全不代表已独立复现", output)
+
+    def test_partial_report_can_disclose_missing_historical_record(self):
+        self.model["analyses"][0].update(status="partial", reason="原始运行日志缺失，未重跑")
+        del self.model["analyses"][0]["provenance"]
+        self.assertIn("原始运行日志缺失", self.instance().render().decode())
+
+    def test_report_total_budget_precedes_source_reads(self):
+        original = w.stable_read
+        def guarded(path, *args):
+            if "/results/" in str(path):
+                raise AssertionError("result source read before budget check")
+            return original(path, *args)
+        with mock.patch.object(w, "REVIEW_TOTAL_LIMIT", 1), mock.patch.object(w, "stable_read", side_effect=guarded):
+            with self.assertRaisesRegex(w.WorkflowError, "exceed 64 MiB"):
+                self.instance()
+
     def test_offline_html_contains_actual_numbers_and_all_data(self):
         rendered = self.instance().render().decode()
         self.assertIn("<strong>0.4 ", rendered)
@@ -322,6 +368,16 @@ class WorkflowIntegrationTests(ReportFixture):
             next(o for o in m["objects"] if o["id"] == "report-check")["sha256"] = self.sha("reviews/report-check.json")
         ctx = self.context(mutate)
         with self.assertRaisesRegex(w.WorkflowError, "evidence mismatch"):
+            science.verify_report(ctx, science.report_policy(ctx))
+
+    def test_report_check_cannot_claim_scientific_rerun(self):
+        evidence = self.read("reviews/report-check.json")
+        evidence["scientific_rerun"] = True
+        self.save("reviews/report-check.json", evidence)
+        def mutate(c, m):
+            next(o for o in m["objects"] if o["id"] == "report-check")["sha256"] = self.sha("reviews/report-check.json")
+        ctx = self.context(mutate)
+        with self.assertRaisesRegex(w.WorkflowError, "scientific_rerun"):
             science.verify_report(ctx, science.report_policy(ctx))
 
     def test_no_independent_report_cannot_record(self):

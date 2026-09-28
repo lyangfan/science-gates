@@ -1,6 +1,17 @@
 ### Result
-"{\"viewport\":390,\"bodyWidth\":390,\"openDetails\":[true,true],\"rows\":[2,6],\"brokenAnchors\":[]}"
+{
+  "viewport": [
+    390,
+    844
+  ],
+  "bodyWidth": 390,
+  "productionOpen": true,
+  "commandWrap": true,
+  "sourceVisible": true,
+  "brokenAnchors": [],
+  "scripts": 0
+}
 ### Ran Playwright code
 ```js
-await page.evaluate('() => (JSON.stringify({viewport:innerWidth,bodyWidth:document.body.scrollWidth,openDetails:Array.from(document.querySelectorAll("details"),d=>d.open),rows:Array.from(document.querySelectorAll("table tbody"),t=>t.rows.length),brokenAnchors:Array.from(document.querySelectorAll("a[href^=\'#\']")).filter(a=>!document.getElementById(a.hash.slice(1))).map(a=>a.hash)}))');
+await page.evaluate('() => ({viewport:[innerWidth,innerHeight], bodyWidth:document.body.scrollWidth, productionOpen:document.querySelector(".production").open, commandWrap:document.querySelector(".production dd:last-child").scrollWidth <= document.querySelector(".production dd:last-child").clientWidth, sourceVisible:document.querySelector("#source-generator").checkVisibility(), brokenAnchors:[...document.querySelectorAll("a[href^=\\"#\\"]")].filter(a=>!document.getElementById(a.hash.slice(1))).map(a=>a.hash), scripts:document.scripts.length})');
 ```

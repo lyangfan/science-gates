@@ -1,29 +1,31 @@
 {
   "kind": "author_validation",
-  "package_version": "1.0.1",
+  "package_version": "1.1.0",
+  "protocol_version": "v12.0-sci",
   "independent_scientific_pass": false,
+  "real_scientific_reruns": 0,
+  "previous_package_commit": "f3baa37ce12e8f7e9fec4ffca9a94dd367dd9cdc",
   "python": "3.11.14",
   "test_suites": {
     "test_digest_table.py": 15,
-    "test_science_skill.py": 45,
+    "test_science_skill.py": 53,
     "test_snapshots.py": 29,
-    "test_verify_digests.py": 43,
-    "test_workflow.py": 61
+    "test_verify_digests.py": 48,
+    "test_workflow.py": 66
   },
-  "tests_passed": 193,
+  "tests_passed": 211,
+  "new_tests": 18,
   "full_suite_log": "validation/test-output.txt",
   "portable_smoke_log": "validation/portable-smoke-release.json",
   "portable_checks_passed": 8,
-  "consolidation": {
-    "previous_package_commit": "2f4a94258a1ee55bc073ebdf8582f7adb2f5074a",
-    "current_code_directory": "scripts",
-    "removed_version_directories": [
-      "scripts/agent_gates",
-      "scripts/agent_gates_v2",
-      "scripts/agent_gates_v3"
-    ],
-    "extracted_helpers_ast_unchanged": 7,
-    "snapshot_module_byte_identical": true
+  "review_read_guards": {
+    "per_file_bytes": 8388608,
+    "declared_total_bytes": 67108864,
+    "digest_cache_read_bytes": 67108864,
+    "remote_content": false,
+    "live_content_snapshot": false,
+    "metadata_content_reads": 0,
+    "scope": "Default review and report inputs; not a filesystem sandbox or a whole-process I/O meter."
   },
   "source_files_unchanged": 12,
   "source_checks": [
@@ -100,64 +102,152 @@
       "matches_recorded_source": true
     }
   ],
-  "checked_document_links": 16,
-  "broken_document_links": [],
+  "documentation_links_checked": [
+    {
+      "file": "SKILL.md",
+      "target": "references/project-setup.md"
+    },
+    {
+      "file": "SKILL.md",
+      "target": "references/protocol.md"
+    },
+    {
+      "file": "SKILL.md",
+      "target": "references/gate-a.md"
+    },
+    {
+      "file": "SKILL.md",
+      "target": "references/gate-b.md"
+    },
+    {
+      "file": "SKILL.md",
+      "target": "references/report.md"
+    },
+    {
+      "file": "SKILL.md",
+      "target": "references/workflow-schema.md"
+    },
+    {
+      "file": "SKILL.md",
+      "target": "references/digests-and-snapshots.md"
+    },
+    {
+      "file": "README.md",
+      "target": "SKILL.md"
+    },
+    {
+      "file": "README.md",
+      "target": "references/project-setup.md"
+    },
+    {
+      "file": "README.md",
+      "target": "references/source-provenance.json"
+    },
+    {
+      "file": "README.md",
+      "target": "references/protocol.md"
+    },
+    {
+      "file": "references/digests-and-snapshots.md",
+      "target": "protocol.md"
+    },
+    {
+      "file": "validation/README.md",
+      "target": "test-output.txt"
+    },
+    {
+      "file": "validation/README.md",
+      "target": "portable-smoke-release.json"
+    },
+    {
+      "file": "validation/README.md",
+      "target": "browser-release.txt"
+    },
+    {
+      "file": "validation/README.md",
+      "target": "browser-mobile.txt"
+    },
+    {
+      "file": "validation/README.md",
+      "target": "skill-validation.txt"
+    },
+    {
+      "file": "validation/README.md",
+      "target": "summary.json"
+    }
+  ],
+  "browser": {
+    "rerun_this_revision": true,
+    "desktop": {
+      "viewport": [
+        1280,
+        900
+      ],
+      "bodyWidth": 1280,
+      "productionOpen": true,
+      "sourceVisible": true,
+      "command": "/Users/liuyangfan/.local/bin/python3.11 -B generate.py",
+      "brokenAnchors": [],
+      "scripts": 0
+    },
+    "mobile": {
+      "viewport": [
+        390,
+        844
+      ],
+      "bodyWidth": 390,
+      "productionOpen": true,
+      "commandWrap": true,
+      "sourceVisible": true,
+      "brokenAnchors": [],
+      "scripts": 0
+    },
+    "synthetic_html": {
+      "path": "/private/tmp/science-gates-v110-_rmz0692/sample project/demo.html",
+      "sha256": "cdd259e3250ed563cf62c0e3c40287320656befaa7afdf59758b9c98966a4f34"
+    },
+    "viewed_screenshots": [
+      "output/playwright/desktop-release.png",
+      "output/playwright/mobile-release.png"
+    ]
+  },
   "artifact_sha256": {
-    "README.md": "190061a7a4ac388e70abbaa8d01646de401fe2935f5a2b5df48692a3e3922993",
-    "SKILL.md": "88237b297fbaf829434e0a5a17d9a3ed50456b0318a81b6aed36d8ca79138420",
-    "VERSION": "44e161e4495cac2cf7858043e9e6418e9579f0ddcfae826f9a372622968ce066",
+    "README.md": "b25bd48dfbac1daf41f24d7c06c6805f38cd1faeb7ffeece620f003b7ca55414",
+    "SKILL.md": "867bac9250f8e82727cb9896a31528899ba8ae15f434e44413d2e366e523a6c7",
+    "VERSION": "1575e1af4a95f12f70b4ee6a6adce8160953d93ea17dc2611b90883ccc3ad3b8",
     "agents/openai.yaml": "42deb24784d8350675a5e179d92c1cea3e75e2378dd935bdc35df849b12a8f84",
-    "assets/report.html": "d77627a0658dc868791b5a09719c9a46e0ad302a159b96c879a891551f49c99f",
-    "output/playwright/desktop-release.png": "c4c0908cdc2bcc4f14db46c945ea869c37ab56db6f132f2a962e4ec4954cfadb",
-    "output/playwright/mobile-release.png": "6823a3553a5d5db0ea1d8c18038a6eec483d4b6d09dcfc1fd455c00e9d51a479",
-    "references/digests-and-snapshots.md": "5b8419756071824d8e0554450225c234780cb7de8e43f444cb9b168aa5a94c4c",
-    "references/gate-a.md": "01b7ff3b200142c26646b13f7bda7290dadfac4ac5134a45448ad1d094a119e9",
-    "references/gate-b.md": "31c593562f5a8950e1cafa2b3f4eaf46225f1350724feca5386d279c3272933a",
+    "assets/report.html": "cbbb765c2b083af4d2266543e27c0f7df38540adf66e0e734e2c10d1b449271c",
+    "output/playwright/desktop-release.png": "036a31d3daef79a91b2ce4fbb7d28142995e77912136ce425406eea0e338dc5b",
+    "output/playwright/mobile-release.png": "c91b6b288c564e2c6997b3f2445a813c829dd801b6d7cb21a4373de6b346bdea",
+    "references/digests-and-snapshots.md": "f09bc4cea3f28a40a1cbade55af098389c51786b2aa64083b3151714eb795ca8",
+    "references/gate-a.md": "3deba015a92d1fe2cdd2bc47df43a34ae770a3f01b07c0f9a4fdc5625a59c693",
+    "references/gate-b.md": "e74d2f35cebc80a6dd651e511b73d1805c857ace3712a96b02dec7fa2f7ef85d",
     "references/project-setup.md": "300c2dff5c4edbaa081122a2c111ccddb2cfca699f7e9251c8745f2592b2aceb",
-    "references/protocol.md": "5e31bd6646f31afbc40bf8abb41e313bb497e5fe03d9d50ff348cb4ecf8abc53",
-    "references/report.md": "a861a0fc39b20bdec0fa383556aeb3acae9556714ff4e0cd1f850a07ec3bb4f1",
-    "references/source-provenance.json": "61546d712d54a311d5f4e96a5cb3850798618843c9985a44d2fd931fb796de90",
-    "references/workflow-schema.md": "6a6fcc8943c2614c7d7eee759caf338e2b56d34b0c561388f75492e417ed83c2",
+    "references/protocol.md": "f28bdeac6a8d0d04e9b803ff448fccd46ed0b9979312a7325c4b3f06efbc7a7b",
+    "references/report.md": "bfb89c79f5500fb6082a146033803013ade12f7eaeec0f6ab75b15f36de80a85",
+    "references/source-provenance.json": "88f423d1fe14809be8ea51ad367f0d667af29590684f975e82fcbdbf74f90e63",
+    "references/workflow-schema.md": "f7cd3da48962221017515c5ca8c3a1eaae6c3f905bfd5eeccb1da8a7d5e4a572",
+    "scripts/.DS_Store": "3775f5afc90ec2fca526d0727d92c67a69b6368485b2386bb29a04cbe300cd16",
     "scripts/digest_table.py": "f25af57ca40275df091d3dafbe246b85d165a10027136f3dde5b0014567da4a4",
     "scripts/g_decision_coverage.py": "87366c4cc0bceb4f7e39df772827ffb697e5ece8ad1a37742a7027e1eda29a93",
-    "scripts/make_example.py": "40ab3fbb5edc7736d2f26ffaf7c6f4aa8980c843a84d5497249646c89dfe4bb9",
+    "scripts/make_example.py": "ccd726f61e5c7bf840c9e6612c3430c72e6d3ca650345055e29ccbacfd987a9a",
     "scripts/prepare.py": "f6ca60ade039aca1f475a1165479b2d9dbe5fb86675208215250cd3e8bf8687b",
-    "scripts/report.py": "cc47e4f3baa10125d2dab953e76b7476f4264cedd2ec42cd664c7cd51f6e706c",
+    "scripts/report.py": "ed756da45d81ac3f6e8b7936de5c07b4f854776b7fde5eec555705b73d2b4056",
     "scripts/run_tests.py": "5f057575be4ce5cc8155911e7cdf8341bc3f3b4ce207719f378ef3c3c33e17dd",
-    "scripts/science.py": "7a1b045b00aab0cc76dd5913f90ce53af957e48f5fa3a198e91ec30007adac08",
+    "scripts/science.py": "3aa9ee13973b1acd1891d5f68edd4ad16213f91f4e5b8f8a69557c5fe9f9abff",
     "scripts/snapshots.py": "c6622ad092d9045a7977c7579d594ac4566332b7eccae81a5536874557ce7a29",
     "scripts/tests/test_digest_table.py": "a14aa2d21105a516a00adc73a14251be18ca2baded2fd8af632daa3bdb5e3841",
-    "scripts/tests/test_science_skill.py": "98a2a32b470f659092cc0f4ea94383ab9c175c4f1b7821c5756682869481b8fe",
+    "scripts/tests/test_science_skill.py": "f8378226af3c84f6958f31afc785779aa2e0f73b37fb2e328310500d3607034b",
     "scripts/tests/test_snapshots.py": "9ef1c3b714508dd26770669ef6bd91bad63508f06dc4165dd32fbbb7d9d85299",
-    "scripts/tests/test_verify_digests.py": "40a26cb9684927c9aeacd3fb7dfc900e29a0120b5c981f39cde781aad442033b",
-    "scripts/tests/test_workflow.py": "56f891bb3dd333f33089f5fc98b580602a94f5ad7db7aaf57045b37eace29d2a",
-    "scripts/verify_digests.py": "697cddb84608f9b5e887f0834a5fc7b8187db78f20047ece50861f595d0157d0",
-    "scripts/workflow.py": "239510e6cc183427ed87e55907cd3550f375a647bf7f0c7fd399236ba7150871",
-    "validation/README.md": "73b7a697a79c54ef146a3f74838422d36c833b63efa0c05bd8ad33f40f3674e0",
-    "validation/browser-mobile.txt": "e6eef0fe1f66aca411edc76b2fbaff58b421da39e98a42abf43f0a73f8894c07",
-    "validation/browser-release.txt": "fd16bbaa56703f2d6c4d51a08a9a8da975e6e5e00cb9f2c57beb97543ad7b75f",
-    "validation/portable-smoke-release.json": "94881f97c27ad6217dbfdfde9fec513cd0ddf71c3b4596f56266a12be38f4d27",
+    "scripts/tests/test_verify_digests.py": "f4eab2bc0d0a6d7b5951d4018d7b65f95c0e1e96e20e23e29b0d946fe74e7343",
+    "scripts/tests/test_workflow.py": "b0ee80e2ffdaa980495b078b4f86ac3a81f262bbd1d96a387b2c36f331a1740a",
+    "scripts/verify_digests.py": "ffb303910ea40c9c812c11266c33e2f5341a7925301d4c9676cb3d450cb7009a",
+    "scripts/workflow.py": "3ddf83e460c2aa541f9f9201758f7e5cb14e14e4a2bc3230dc466fbfc92b91bc",
+    "validation/README.md": "9342398b3fb00de8c14729498eee24bbfbd3ee12b04ee5c1fdbaeac23d24c463",
+    "validation/browser-mobile.txt": "4b2c42a2414e58fcecebcab2ffc7f90f3e1079046b9c62196df1b0408785b54d",
+    "validation/browser-release.txt": "ef0564c50e5ffd95721c5015d1cc426e22606f185e5043cfe1287b1615c91fa9",
+    "validation/portable-smoke-release.json": "6bd2e9fa3638782047d57faa5ff6b99b6321b6d5bee6e0cecab1f553f48ca021",
     "validation/skill-validation.txt": "db349825903d66adffea3ecf1bd8e1803043e8a71cf1a051235dabc5371f5bb0",
-    "validation/test-output.txt": "737564a505d35494489023597905be3ddbfa3a86e5e35b341077d4442552cf71"
-  },
-  "browser": {
-    "desktop_viewport": [
-      1280,
-      900
-    ],
-    "mobile_viewport": [
-      390,
-      844
-    ],
-    "mobile_body_width": 390,
-    "broken_anchors": [],
-    "screenshots": {
-      "output/playwright/desktop-release.png": "c4c0908cdc2bcc4f14db46c945ea869c37ab56db6f132f2a962e4ec4954cfadb",
-      "output/playwright/mobile-release.png": "6823a3553a5d5db0ea1d8c18038a6eec483d4b6d09dcfc1fd455c00e9d51a479"
-    },
-    "rerun_this_revision": false,
-    "evidence_from_package_commit": "2f4a94258a1ee55bc073ebdf8582f7adb2f5074a",
-    "reuse_basis": "Regenerated synthetic HTML has identical bytes; template bytes unchanged.",
-    "synthetic_html_sha256": "60dad681b187f9dbcbfa206b510f0293fde6d846d82bf0d6dffbe7f46a8a83b7"
+    "validation/test-output.txt": "ac6fd6aee4a640be85d9354d1f00baa3810cac1a4d431623a57a09f42f89d7fc"
   }
 }

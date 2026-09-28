@@ -127,6 +127,54 @@ class WorkflowTests(unittest.TestCase):
         self.assertEqual(stats["content_files"], 1)
         self.assertEqual(stats["content_bytes"], len(b"raw evidence\n"))
 
+    def test_review_large_file_rejected_before_hash(self):
+        with open(self.root / "evidence.txt", "wb") as handle:
+            handle.truncate(w.CONTROL_LIMIT + 1)
+        with mock.patch.object(w, "load_digest_backend", side_effect=AssertionError("hash backend started")):
+            with self.assertRaisesRegex(w.WorkflowError, "exceeds 8 MiB"):
+                self.context()
+
+    def test_review_aggregate_budget_rejected_before_hash(self):
+        with mock.patch.object(w, "REVIEW_TOTAL_LIMIT", 1), \
+                mock.patch.object(w, "load_digest_backend", side_effect=AssertionError("hash backend started")):
+            with self.assertRaisesRegex(w.WorkflowError, "exceed 64 MiB"):
+                self.context()
+
+    def test_review_remote_content_rejected_before_ssh(self):
+        self.contract["allowed_hosts"].append("fixture_host")
+        self.freeze_contract()
+        self.manifest["objects"][0]["path"] = "fixture_host:/data/results.txt"
+        with mock.patch.object(w.subprocess, "run", side_effect=AssertionError("remote command started")):
+            with self.assertRaisesRegex(w.WorkflowError, "cannot hash remote content"):
+                self.context()
+
+    def test_review_content_snapshot_rejected_before_hash_or_walk(self):
+        self.snapshot(str(self.root / "safe"))
+        ctx = self.context()
+        backend = w.load_digest_backend()
+        with mock.patch.object(w, "load_digest_backend", return_value=backend), \
+                mock.patch.object(backend.ContentCache, "compute", side_effect=AssertionError("hash started")), \
+                mock.patch.object(backend.snapshots, "compare_snapshot", side_effect=AssertionError("walk started")):
+            with self.assertRaisesRegex(w.WorkflowError, "cannot rescan content"):
+                ctx.check()
+
+    def test_review_metadata_snapshot_never_opens_target_content(self):
+        self.write("safe/large.bin", b"sample")
+        backend = w.load_digest_backend()
+        self.snapshot(str(self.root / "safe"), mode="metadata")
+        baseline = json.loads((self.root / "baseline.json").read_text())
+        baseline["records"] = backend.snapshots.collect(str(self.root / "safe"), "metadata", [])["records"]
+        self.save("baseline.json", baseline)
+        next(o for o in self.manifest["objects"] if o["id"] == "baseline")["sha256"] = self.sha("baseline.json")
+        ctx = self.context()
+        real_open = open
+        def guarded(path, *args, **kwargs):
+            if str(path).endswith("large.bin"):
+                raise AssertionError("metadata read target bytes")
+            return real_open(path, *args, **kwargs)
+        with mock.patch("builtins.open", side_effect=guarded):
+            ctx.check()
+
     def test_jsonl_scientific_evidence_is_not_a_snapshot(self):
         raw = b'{"id": "one", "value": 1}\n{"id": "two", "value": 2}\n'
         self.write("records.jsonl", raw)
@@ -407,6 +455,13 @@ class WorkflowTests(unittest.TestCase):
         self.manifest["objects"].append({"id": "plan", "path": "plan.json", "role": "evidence", "state": "present",
             "sha256": self.sha("plan.json"), "preservation": "external:fixture"})
         self.manifest["snapshot_plan"] = "plan"
+        with self.assertRaisesRegex(w.WorkflowError, "cannot rescan content"):
+            self.context().check()
+        # Explicit prepare/execute capability remains separate from review.
+        self.manifest["stage"] = "prepare"
+        self.manifest["acceptance"] = []
+        self.contract["scope"] = "full_chain"
+        self.freeze_contract()
         self.context().check()
 
     def test_protection_anchor_cannot_be_refreshed(self):

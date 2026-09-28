@@ -22,6 +22,7 @@ import sys
 
 sys.dont_write_bytecode = True
 CONTROL_LIMIT = 8 * 1024 * 1024
+REVIEW_TOTAL_LIMIT = 64 * 1024 * 1024
 HEX = re.compile(r"[0-9a-f]{64}\Z")
 COMMIT = re.compile(r"(?:[0-9a-f]{40}|[0-9a-f]{64})\Z")
 ROLES = {"authority", "candidate", "dependency", "scientific_input", "product", "evidence"}
@@ -353,6 +354,32 @@ class Context:
                     ":" not in self.objects[oid]["path"], "snapshot plan must be a present local object")
         self._protection()
         self._history()
+        self.review_read_scope()
+
+    def is_review(self):
+        return self.manifest["stage"] in PREEXEC | RESULT | {"addendum"}
+
+    def review_read_scope(self):
+        """Review existing small evidence; never silently rehash raw remote data."""
+        if not self.is_review():
+            return
+        paths = {self.manifest_path, self.manifest["contract"]["path"],
+                 self.contract["authority"]["path"], self.contract["source_catalog"]["path"]}
+        for obj in self.objects.values():
+            if obj["state"] != "present":
+                continue
+            require(":" not in obj["path"],
+                    "review cannot hash remote content; reference saved local evidence and origin manifests")
+            paths.add(obj["path"])
+            if obj["preservation"].startswith("git:"):
+                paths.add(obj["preservation"][4:])
+        total = 0
+        for path in paths:
+            info = safe_local(self.root, path).stat()
+            require(stat.S_ISREG(info.st_mode) and info.st_size <= CONTROL_LIMIT,
+                    "review file exceeds 8 MiB; supply bounded evidence without changing scientific scope: " + path)
+            total += info.st_size
+        require(total <= REVIEW_TOTAL_LIMIT, "review inputs exceed 64 MiB; narrow to the affected evidence")
 
     def forbidden(self, path):
         alternatives = [path]
@@ -562,12 +589,18 @@ class Context:
             self.snapshot_scope(parsed["target"], scan=entry["action"] == "verify")
             entries.append((entry, baseline, parsed))
             seen.add(entry["baseline"])
+        if self.is_review():
+            require(all(entry["action"] == "historical" or parsed["mode"] == "metadata"
+                        for entry, _, parsed in entries),
+                    "review cannot rescan content snapshots; preserve history and use approved metadata protection")
         return entries
 
     def check(self, commit=None):
         """Verify the explicitly listed current content, never the whole spec tree."""
+        self.review_read_scope()
         backend = load_digest_backend()
-        cache = backend.ContentCache()
+        cache = backend.ContentCache(max_file_bytes=CONTROL_LIMIT, max_total_bytes=REVIEW_TOTAL_LIMIT) \
+            if self.is_review() else backend.ContentCache()
         controls = [(self.manifest_path, self.manifest_sha256),
                     (self.manifest["contract"]["path"], self.contract_sha256),
                     (self.contract["authority"]["path"], self.contract["authority"]["sha256"]),

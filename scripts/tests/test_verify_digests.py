@@ -604,5 +604,71 @@ class RemoteBatchTests(unittest.TestCase):
             CORE.ContentCache().compute(["probe.invalid:" + path for path in paths])
 
 
+class ReviewBudgetTests(unittest.TestCase):
+    def setUp(self):
+        self.temp = tempfile.TemporaryDirectory(prefix="science-review-budget-", dir="/tmp")
+        self.addCleanup(self.temp.cleanup)
+        self.root = Path(self.temp.name)
+
+    def test_oversized_file_fails_before_open(self):
+        target = self.root / "large.bin"
+        target.write_bytes(b"123456789")
+        with patch("builtins.open", side_effect=AssertionError("content opened")):
+            with self.assertRaisesRegex(RuntimeError, "content budget"):
+                CORE.ContentCache(max_file_bytes=8).local(str(target))
+
+    def test_total_budget_counts_unique_reads(self):
+        a, b = self.root / "a.txt", self.root / "b.txt"
+        a.write_bytes(b"1234")
+        b.write_bytes(b"56789")
+        cache = CORE.ContentCache(max_file_bytes=8, max_total_bytes=8)
+        self.assertEqual(cache.local(str(a)), cache.local(str(a)))
+        self.assertEqual(cache.read_bytes, 4)
+        with patch("builtins.open", side_effect=AssertionError("second file opened")):
+            with self.assertRaisesRegex(RuntimeError, "total byte budget"):
+                cache.local(str(b))
+
+    def test_file_growth_stops_at_budget_plus_one(self):
+        target = self.root / "growing.txt"
+        target.write_bytes(b"1234")
+        real_open = open
+        class GrowingReader:
+            def __enter__(self):
+                self.handle = real_open(target, "rb")
+                return self
+            def __exit__(self, *args):
+                self.handle.close()
+            def fileno(self):
+                return self.handle.fileno()
+            def read(self, amount):
+                with real_open(target, "ab") as writer:
+                    writer.write(b"x" * 100)
+                return self.handle.read(amount)
+        cache = CORE.ContentCache(max_file_bytes=8, max_total_bytes=8)
+        with patch("builtins.open", return_value=GrowingReader()):
+            with self.assertRaisesRegex(RuntimeError, "grew beyond"):
+                cache.local(str(target))
+        self.assertEqual(cache.read_bytes, 9)
+
+    def test_remote_ref_fails_before_local_content_or_ssh(self):
+        cache = CORE.ContentCache(max_file_bytes=8)
+        with patch.object(cache, "local", side_effect=AssertionError("local read")), \
+                patch.object(CORE, "remote_content", side_effect=AssertionError("SSH")):
+            with self.assertRaisesRegex(RuntimeError, "remote content"):
+                cache.compute(["small.txt", "fixture_host:/huge.bin"])
+
+    def test_git_blob_size_checked_before_content_with_either_budget(self):
+        for options in ({"max_file_bytes": 8}, {"max_total_bytes": 8}):
+            calls = []
+            def git(args, **kwargs):
+                calls.append(args)
+                self.assertEqual(args[3:5], ["cat-file", "-s"])
+                return subprocess.CompletedProcess(args, 0, "9\n", "")
+            with self.subTest(options=options), patch.object(CORE.subprocess, "run", side_effect=git):
+                with self.assertRaisesRegex(RuntimeError, "Git blob exceeds"):
+                    CORE.ContentCache(**options).blob(str(self.root), "a" * 40, "old.bin")
+                self.assertEqual(len(calls), 1)
+
+
 if __name__ == "__main__":
     unittest.main()

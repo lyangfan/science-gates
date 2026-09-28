@@ -1,6 +1,17 @@
 ### Result
-"{\"viewport\":390,\"bodyWidth\":390,\"scrollHint\":\"block\",\"figureScrollable\":true,\"brokenAnchors\":[]}"
+{
+  "viewport": [
+    1280,
+    900
+  ],
+  "bodyWidth": 1280,
+  "productionOpen": true,
+  "sourceVisible": true,
+  "command": "/Users/liuyangfan/.local/bin/python3.11 -B generate.py",
+  "brokenAnchors": [],
+  "scripts": 0
+}
 ### Ran Playwright code
 ```js
-await page.evaluate('() => (JSON.stringify({viewport:innerWidth,bodyWidth:document.body.scrollWidth,scrollHint:getComputedStyle(document.querySelector(".scroll-hint")).display,figureScrollable:document.querySelector("figure").scrollWidth>document.querySelector("figure").clientWidth,brokenAnchors:Array.from(document.querySelectorAll("a[href^=\'#\']")).filter(a=>!document.getElementById(a.hash.slice(1))).map(a=>a.hash)}))');
+await page.evaluate('() => ({viewport:[innerWidth,innerHeight], bodyWidth:document.body.scrollWidth, productionOpen:document.querySelector(".production").open, sourceVisible:document.querySelector("#source-generator").checkVisibility(), command:document.querySelector(".production code").textContent, brokenAnchors:[...document.querySelectorAll("a[href^=\\"#\\"]")].filter(a=>!document.getElementById(a.hash.slice(1))).map(a=>a.hash), scripts:document.scripts.length})');
 ```

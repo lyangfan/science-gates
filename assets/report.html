@@ -22,6 +22,7 @@ img{display:block;max-width:100%;height:auto}figcaption{font-size:14px;color:var
 .notice{background:#fff5e3;padding:16px 20px;border-radius:8px}.evidence{font-size:13px;color:var(--muted)}.provenance{padding:24px 32px;border-top:1px solid var(--line);color:var(--muted)}code{overflow-wrap:anywhere}.digest{font:12px/1.8 ui-monospace,monospace;overflow-wrap:anywhere}footer{font-size:13px;color:var(--muted);padding:20px 0}.scroll-hint{display:none;color:var(--muted);font-size:13px}figure:focus-visible{outline:3px solid #d97d32;outline-offset:4px}
 @media(max-width:650px){main{padding:20px 12px}header,.analysis{padding:24px 18px}figure{padding:14px}.metrics{grid-template-columns:1fr}.provenance{padding:20px 14px}.scroll-hint{display:block}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+.production{border-top:1px solid var(--line);padding-top:16px}.production dl{display:grid;grid-template-columns:minmax(90px,140px) minmax(0,1fr);gap:10px 14px}.production dt{font-weight:600}.production dd{margin:0;overflow-wrap:anywhere}.production pre{white-space:pre-wrap;overflow-wrap:anywhere;margin:0;font-size:13px}
 @media print{body{background:white}main{max-width:none;padding:0}nav{display:none}.analysis{break-before:auto;box-shadow:none}.metric,figure{break-inside:avoid}.table-scroll{overflow:visible;max-height:none}details{display:block}svg{min-width:0}.provenance{break-before:page}}
 </style>
 </head>
@@ -30,7 +31,7 @@ img{display:block;max-width:100%;height:auto}figcaption{font-size:14px;color:var
 <header><div class="eyebrow">SCIENCE · EXPERIMENT REPORT</div><h1>@@TITLE@@</h1><p class="lead">@@OVERVIEW@@</p><div class="summary"><strong>主要发现</strong><p>@@SUMMARY@@</p></div></header>
 <nav aria-label="分析导航">@@NAV@@</nav>
 @@ANALYSES@@
-<details class="provenance"><summary>数据来源与复现定位</summary>@@PROVENANCE@@</details>
+<details class="provenance"><summary>数据来源与版本定位</summary>@@PROVENANCE@@</details>
 <footer>科学结论以本报告所列样本、方法与证据范围为限。报告生成及机械校验本身不构成独立科学验收。</footer>
 </main>
 </body>

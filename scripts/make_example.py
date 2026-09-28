@@ -3,8 +3,11 @@
 from __future__ import annotations
 
 import argparse
+import datetime
 import json
 from pathlib import Path
+import shlex
+import subprocess
 import sys
 
 sys.dont_write_bytecode = True
@@ -28,8 +31,34 @@ def create(root):
         return {"path": path, "sha256": w.digest((root / path).read_bytes())}
     write("spec.md", "# 合成示例，非真实科学结果\n\n比较三个合成对象的方法 A/B；展示逐对象误差及组均值。\n"
           "所有数值仅演示接口，不用于方法优劣的科学判断。\n")
-    write("results/summary.csv", "method,n,mean_error\nA,3,0.4\nB,3,0.2\n")
-    write("results/cases.csv", "case,method,error\nS01,A,0.3\nS02,A,0.4\nS03,A,0.5\nS01,B,0.1\nS02,B,0.2\nS03,B,0.3\n")
+    save("input.json", {"synthetic": True, "A": ["0.3", "0.4", "0.5"], "B": ["0.1", "0.2", "0.3"]})
+    write("generate.py", '''"""Generate this tiny synthetic fixture once, not a real experiment."""
+import csv
+from decimal import Decimal
+import json
+from pathlib import Path
+
+data = json.loads(Path("input.json").read_text())
+assert data["synthetic"] is True
+with open("results/cases.csv", "x", newline="") as cases, open("results/summary.csv", "x", newline="") as summary:
+    cw = csv.writer(cases, lineterminator="\\n")
+    sw = csv.writer(summary, lineterminator="\\n")
+    cw.writerow(["case", "method", "error"])
+    sw.writerow(["method", "n", "mean_error"])
+    for method in ("A", "B"):
+        values = data[method]
+        cw.writerows(("S%02d" % (i + 1), method, value) for i, value in enumerate(values))
+        sw.writerow([method, len(values), sum(map(Decimal, values)) / len(values)])
+print("Synthetic fixture: 6 case rows and 2 summary rows generated.")
+''')
+    argv = [sys.executable, "-B", "generate.py"]
+    started = datetime.datetime.now(datetime.timezone.utc).isoformat()
+    generation = subprocess.run(argv, cwd=root, capture_output=True, text=True, check=False)
+    save("reviews/generation.json", {"synthetic": True, "argv": argv, "cwd": str(root),
+        "started_utc": started, "finished_utc": datetime.datetime.now(datetime.timezone.utc).isoformat(),
+        "exit_code": generation.returncode, "stdout": generation.stdout, "stderr": generation.stderr,
+        "code": ref("generate.py"), "input": ref("input.json"), "independent_reproduction": False})
+    w.require(generation.returncode == 0, "synthetic fixture generation failed")
     report_contract = {"schema": report.CONTRACT, "spec": ref("spec.md"),
                        "analyses": [{"id": "EXP1", "title": "合成方法比较", "visualization": "required"}]}
     save("reviews/report-contract.json", report_contract)
@@ -40,12 +69,17 @@ def create(root):
         "spec": ref("spec.md"),
         "sources": [
             {"id": "summary", **ref("results/summary.csv"), "format": "csv", "label": "合成汇总表", "keys": ["method"]},
-            {"id": "cases", **ref("results/cases.csv"), "format": "csv", "label": "合成逐对象数据", "keys": ["case", "method"]}],
+            {"id": "cases", **ref("results/cases.csv"), "format": "csv", "label": "合成逐对象数据", "keys": ["case", "method"]},
+            {"id": "generator", **ref("generate.py"), "format": "text", "label": "合成数据生成代码"},
+            {"id": "fixture-input", **ref("input.json"), "format": "text", "label": "合成输入"},
+            {"id": "generation-record", **ref("reviews/generation.json"), "format": "text", "label": "本次实际生成记录"}],
         "analyses": [{
             "id": "EXP1", "title": "合成方法比较", "status": "completed",
             "purpose": "说明同一批对象上两种方法的结果如何完整、可追溯地呈现。",
             "methods": ["为 S01–S03 各构造方法 A、B 的误差，共六条记录。", "按方法求三对象的算术均值；不做推断统计。"],
             "sample": "3 个合成对象，两种方法各 3 条记录；单位为示例误差单位。",
+            "provenance": {"code_sources": ["generator"], "input_sources": ["fixture-input"],
+                           "commands": [shlex.join(argv)], "record_sources": ["generation-record"]},
             "results": [
                 {"id": "meanA", "label": "方法 A 平均误差", "unit": "示例单位", "source": "summary", "where": {"method": "A"}, "column": "mean_error"},
                 {"id": "meanB", "label": "方法 B 平均误差", "unit": "示例单位", "source": "summary", "where": {"method": "B"}, "column": "mean_error"}],
@@ -90,7 +124,10 @@ def create(root):
         ("report-check", "reviews/report-check.json", "evidence"),
         ("report-contract", "reviews/report-contract.json", "dependency"),
         ("summary", "results/summary.csv", "scientific_input"),
-        ("cases", "results/cases.csv", "scientific_input")]
+        ("cases", "results/cases.csv", "scientific_input"),
+        ("generator", "generate.py", "dependency"),
+        ("fixture-input", "input.json", "scientific_input"),
+        ("generation-record", "reviews/generation.json", "evidence")]
     manifest = {
         "schema": w.MANIFEST, "chain": "synthetic-example", "gate": "B", "stage": "addendum",
         "contract": ref("reviews/workflow-contract.json"),

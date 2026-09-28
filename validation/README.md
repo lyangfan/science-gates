@@ -1,24 +1,27 @@
-# 当前版本的作者验证
+# 作者验证记录
 
-本目录记录 science-gates 1.0.1 的工具验证，不是独立科学审查，不授予真实实验 PASS。
+本目录记录 science-gates 1.1.0 的工具验证，不是独立科学审查，不授予真实实验 PASS。
 
-- 已移除 agent_gates、agent_gates_v2、agent_gates_v3 三套目录，当前实现位于 scripts/，
-  测试集中在 scripts/tests/；旧实现与旧验证日志可从 Git 提交
-  `2f4a94258a1ee55bc073ebdf8582f7adb2f5074a` 读取。
-- Python 3.11 共 **193 项测试通过**：摘要表与 Git 辅助函数 15 项、摘要 CLI 43 项、
-  目录巡检 29 项、工作流 61 项、SCI/报告集成 45 项。原始输出见
-  [test-output.txt](test-output.txt)。测试中的失败 receipt 是预期的错误传播反例。
-- 保留当前摘要、巡检、工作流和报告的全部原有测试；旧套件的摘要表、Git 映射、diff、
-  远端分批等有效回归迁至当前接口，移除旧 ENG 专属或已由当前套件覆盖的用例。
-- 从旧入口提取的 7 个解析/Git 函数，AST 与原实现一致；目录巡检模块逐字节不变。
-  没有把旧 CLI 或整套旧实现换名藏入辅助模块。
-- 将当前 scripts/ 和 assets/ 复制到独立目录后，从外部工作目录调用；skill 与项目路径均含空格。
-  合成示例生成、完整 check 及 6 个脚本入口的帮助检查共 8 项通过，见
-  [portable-smoke-release.json](portable-smoke-release.json)。
-- 重新生成的示例 HTML 与整合前逐字节相同。因此保留创建时 1280×900、390×844 的浏览器
-  检查和截图；本轮没有重新运行浏览器。图表、结论、来源和报告合同的测试仍全部执行。
-- skill-creator 的 quick_validate 通过，见 [skill-validation.txt](skill-validation.txt)。
-  文档链接、来源文件和当前文件摘要见 [summary.json](summary.json)。
+- Python 3.11 共 **211 项测试通过**：摘要表/Git 15 项、摘要 CLI 及读取预算 48 项、
+  目录巡检 29 项、工作流 66 项、SCI/报告集成 53 项。原始输出见
+  [test-output.txt](test-output.txt)。其中失败 receipt 是预期的错误传播反例。
+- 新增 18 项反例/行为测试：缺来源、伪造执行记录、虚报科学重算、报告命令不执行、
+  超出单文件/总读取预算、读取中增长、远端内容与现场 content 快照拦截。
+  metadata 巡检不会打开目标文件内容，显式执行阶段原有内容核验能力继续保留。
+- 在独立目录复制 scripts/ 与 assets/，skill 和项目路径均含空格；小型合成示例、
+  完整 check 与 6 个入口帮助检查共 8 项通过，见
+  [portable-smoke-release.json](portable-smoke-release.json)。示例生成代码只实际运行一次，
+  保存真实命令/日志；报告 check 不执行该命令，也不重算结果。
+- 本版重新用浏览器检查 1280×900 和 390×844：来源折叠区可展开、来源链接可达、
+  命令在窄屏换行、无页面横向溢出；图表在窄屏有独立滚动区域。
+  原始检查见 [browser-release.txt](browser-release.txt)、[browser-mobile.txt](browser-mobile.txt)，
+  截图在 output/playwright/。已实际查看两张截图。
+- skill-creator quick_validate 通过，见 [skill-validation.txt](skill-validation.txt)。
+  文档链接、来源文件与当前字节身份见 [summary.json](summary.json)。
 
-原 swine-CT-article 项目不作修改；仅检查来源清单指定的 12 份小型脚本和协议文档的身份。
-本轮不连接科研服务器、不读取大型科学输入、不重跑科学分析。
+当前仅有 scripts/ 一套实现。此前版本、协议与验证记录保留在 Git（本轮起点 f3baa37）。
+原 swine-CT-article 项目不作修改；只读取来源清单中的 12 份小型脚本与协议核其身份。
+本轮不连接科研服务器、不读取大型科学输入、不重跑真实科学分析。
+
+读取预算是默认成本保护，不是沙箱或独立科学正确性证明。完整内容核验的底层命令仍存在，
+必须按协议另行明确范围；不得自动以其绕过审查预算。未重算不等于证据缺口自动获得豁免。
