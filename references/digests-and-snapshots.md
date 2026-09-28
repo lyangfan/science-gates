@@ -1,8 +1,8 @@
 # 摘要与目录巡检后端
 
-包内 `scripts/agent_gates_v2/verify_digests.py` 是 [SCI 协议](protocol.md) 的 SCI 专用入口。它将实际输入的内容 SHA256 核验与禁写目录巡检分开，保留 `write`、`check`、`snapshot` 三个入口及 SCI 使用的 `check` 参数。不支持 ENG 旧 subject 副本参数 `--review-root` / `--large-suffix`；ENG 不由此 skill 维护。
+包内 `scripts/verify_digests.py` 是 [SCI 协议](protocol.md) 的 SCI 专用入口。它将实际输入的内容 SHA256 核验与禁写目录巡检分开，保留 `write`、`check`、`snapshot` 三个入口及 SCI 使用的 `check` 参数。不支持 ENG 旧 subject 副本参数 `--review-root` / `--large-suffix`；ENG 不由此 skill 维护。
 
-旧 `scripts/agent_gates/verify_digests.py` 和旧测试保持原字节。新入口实际使用的 `snapshots.py` 等模块须列入派发 SHA256 表；若导入旧脚本的 `parse_rows` 等函数，旧脚本也是实际只读依赖，必须一并登记，不能只登记新入口。进行中的链须有明确的治理替换授权，不能通过换路径绕过冻结依赖约束。
+包内仅保留当前 `verify_digests.py`，它直接依赖同目录的 `snapshots.py` 和 `digest_table.py`，不加载旧版脚本。这三个实际依赖都须列入派发 SHA256 表，不能只登记入口。历史实现可从 Git 固定提交读取；原项目中的冻结文件不随本包升级而改写。进行中的链须有明确的治理替换授权，不能通过换路径绕过冻结依赖约束。
 
 ## 内容身份与目录巡检
 
@@ -25,26 +25,26 @@
 
 ```bash
 # 只填摘要占位符，不刷新已有值，不扫描快照目录。
-python3 /absolute/path/to/science-gates/scripts/agent_gates_v2/verify_digests.py write runs/example/reviews/B/dispatch-c1.md
+python3 /absolute/path/to/science-gates/scripts/verify_digests.py write runs/example/reviews/B/dispatch-c1.md
 
 # 新建内容基线；--mode 缺省也是 content。
-python3 /absolute/path/to/science-gates/scripts/agent_gates_v2/verify_digests.py snapshot data/example/ --mode content -o runs/example/reviews/B/snapshot-data-content.txt
+python3 /absolute/path/to/science-gates/scripts/verify_digests.py snapshot data/example/ --mode content -o runs/example/reviews/B/snapshot-data-content.txt
 
 # 新建 metadata 基线；真实采集时点是新监测起点。
-python3 /absolute/path/to/science-gates/scripts/agent_gates_v2/verify_digests.py snapshot data/example/ --mode metadata -o runs/example/reviews/B/snapshot-data-metadata.txt
+python3 /absolute/path/to/science-gates/scripts/verify_digests.py snapshot data/example/ --mode metadata -o runs/example/reviews/B/snapshot-data-metadata.txt
 
 # 含快照的派发必须显式传计划，提交前、提交后使用同一份已冻结计划。
-python3 /absolute/path/to/science-gates/scripts/agent_gates_v2/verify_digests.py check runs/example/reviews/B/dispatch-c1.md --precommit --snapshot-plan runs/example/reviews/B/snapshot-plan-c1.json
-python3 /absolute/path/to/science-gates/scripts/agent_gates_v2/verify_digests.py check runs/example/reviews/B/dispatch-c1.md --commit "<完整固定commit hash>" --snapshot-plan runs/example/reviews/B/snapshot-plan-c1.json
+python3 /absolute/path/to/science-gates/scripts/verify_digests.py check runs/example/reviews/B/dispatch-c1.md --precommit --snapshot-plan runs/example/reviews/B/snapshot-plan-c1.json
+python3 /absolute/path/to/science-gates/scripts/verify_digests.py check runs/example/reviews/B/dispatch-c1.md --commit "<完整固定commit hash>" --snapshot-plan runs/example/reviews/B/snapshot-plan-c1.json
 
 # 以下是显式全表核验，可能读取大量影像；不是每轮默认检查。
 # 只有确实要求核整个 spec 输入表时才使用；sha256 在第三列时加 --digest-col 3。
-python3 /absolute/path/to/science-gates/scripts/agent_gates_v2/verify_digests.py check docs/example-spec-v001.md --digest-col 3
+python3 /absolute/path/to/science-gates/scripts/verify_digests.py check docs/example-spec-v001.md --digest-col 3
 ```
 
 `snapshot` 目标已存在时拒绝覆盖。`--exclude` 沿用逗号分隔的相对路径 glob，排除面写入基线，复核采用同一范围。远端目标沿用 `host:/absolute/directory/` 写法；只读扫描权限仍由派发白名单决定。
 
-v2 JSON 基线通过 schema `agent-gates.snapshot.v2` 识别，JSON 键序无关。对象形 JSON 控制 / 数据文件最多读取 32 MiB 做静态解析；超出预算显式报错，不静默按普通文件处理而略过快照。
+JSON 基线通过 schema `agent-gates.snapshot.v2` 识别，JSON 键序无关。schema 的 `.v2` 是数据格式标识，不表示包内保留多套脚本实现。对象形 JSON 控制 / 数据文件最多读取 32 MiB 做静态解析；超出预算显式报错，不静默按普通文件处理而略过快照。
 
 r1 / Closure 的 `check` 仍须带 `--claimed-changed <逗号分隔的Git相对路径>` 与 `--diff <本轮patch>`，并遵守协议的比较基准规则。`--precommit` 与 `--commit` 互斥；`--commit` 不能使用 `HEAD`、分支或短 hash。
 
@@ -60,7 +60,7 @@ r1 / Closure 的 `check` 仍须带 `--claimed-changed <逗号分隔的Git相对�
 例如，对已生成的派生核验表执行：
 
 ```bash
-python3 /absolute/path/to/science-gates/scripts/agent_gates_v2/verify_digests.py check runs/example/reviews/B/gate-a-current-inputs.md
+python3 /absolute/path/to/science-gates/scripts/verify_digests.py check runs/example/reviews/B/gate-a-current-inputs.md
 ```
 
 这不是科学输入跳过机制，也不允许把其它输入替换成历史副本。完整科学输入表的显式核验能力继续保留；每阶段的实际消费面由本轮派发与执行证据明确，而非工具自动猜测。
@@ -116,7 +116,7 @@ plan、baseline 和 diff 实际消费的字节均须绑定表列 SHA256。核验
 
 ```bash
 set -o pipefail
-python3 /absolute/path/to/science-gates/scripts/agent_gates_v2/verify_digests.py check runs/example/reviews/B/dispatch-c1.md --precommit --snapshot-plan runs/example/reviews/B/snapshot-plan-c1.json 2>&1 | tee /tmp/agent-gates-check.txt
+python3 /absolute/path/to/science-gates/scripts/verify_digests.py check runs/example/reviews/B/dispatch-c1.md --precommit --snapshot-plan runs/example/reviews/B/snapshot-plan-c1.json 2>&1 | tee /tmp/agent-gates-check.txt
 ```
 
 核验非零时停止后续派发。正式 evidence 仍按协议使用独占递增文件名；日志写出成功不表示核验成功。

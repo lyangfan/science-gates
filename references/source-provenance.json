@@ -4,66 +4,89 @@
   "files": [
     {
       "source": "tools/agent_gates/g_decision_coverage.py",
-      "destination": "scripts/agent_gates/g_decision_coverage.py",
-      "sha256": "939ba9f077c24ebd4a1fbd3d16e1f8fddcb1b6c7a0fb25ab47a718950f11288f"
+      "destination": "scripts/g_decision_coverage.py",
+      "source_sha256": "939ba9f077c24ebd4a1fbd3d16e1f8fddcb1b6c7a0fb25ab47a718950f11288f",
+      "adaptation": "Relocated; current SCI help text.",
+      "adapted": true
     },
     {
       "source": "tools/agent_gates/test_verify_digests.py",
-      "destination": "scripts/agent_gates/test_verify_digests.py",
-      "sha256": "84c4a0e57d19a4a96fb9cf077d4fc57d6b5e9685f3fee8f321aab74de2c68593"
+      "destination": "scripts/tests/test_digest_table.py",
+      "source_sha256": "84c4a0e57d19a4a96fb9cf077d4fc57d6b5e9685f3fee8f321aab74de2c68593",
+      "adaptation": "Retained the nine digest-table regressions against the current CLI. Obsolete ENG tests removed; current Git helper checks added. Overlapping SCI CLI checks live in test_verify_digests.py.",
+      "adapted": true
     },
     {
       "source": "tools/agent_gates/verify_digests.py",
-      "destination": "scripts/agent_gates/verify_digests.py",
-      "sha256": "469c0c9b7774cb8d7cb64d3206db12953070b7248ed55d74d6a37dfc3565b11c"
+      "destination": "scripts/digest_table.py",
+      "source_sha256": "469c0c9b7774cb8d7cb64d3206db12953070b7248ed55d74d6a37dfc3565b11c",
+      "adaptation": "Extracted only split_cells, split_remote, git_state, git_repository, repository_path, validate_commit, parse_rows and required constants. Removed old CLI, ENG preservation and duplicate snapshot/check/write code.",
+      "adapted": true
     },
     {
       "source": "tools/agent_gates_v2/snapshots.py",
-      "destination": "scripts/agent_gates_v2/snapshots.py",
-      "sha256": "c6622ad092d9045a7977c7579d594ac4566332b7eccae81a5536874557ce7a29"
+      "destination": "scripts/snapshots.py",
+      "source_sha256": "c6622ad092d9045a7977c7579d594ac4566332b7eccae81a5536874557ce7a29",
+      "adaptation": "Relocated without behavior or byte changes.",
+      "adapted": false
     },
     {
       "source": "tools/agent_gates_v2/test_snapshots.py",
-      "destination": "scripts/agent_gates_v2/test_snapshots.py",
-      "sha256": "876c9012e078eb65be91985259cd666163b5e72c173d5aec8b6a9dbe931e4072"
+      "destination": "scripts/tests/test_snapshots.py",
+      "source_sha256": "876c9012e078eb65be91985259cd666163b5e72c173d5aec8b6a9dbe931e4072",
+      "adaptation": "Relocated; imports point at current scripts.",
+      "adapted": true
     },
     {
       "source": "tools/agent_gates_v2/test_verify_digests.py",
-      "destination": "scripts/agent_gates_v2/test_verify_digests.py",
-      "sha256": "64068722453dd798ee04cb39f6ac949e283b1d8cd226afce772f10c733792106"
+      "destination": "scripts/tests/test_verify_digests.py",
+      "source_sha256": "64068722453dd798ee04cb39f6ac949e283b1d8cd226afce772f10c733792106",
+      "adaptation": "Relocated; imports and fixture names updated.",
+      "adapted": true
     },
     {
       "source": "tools/agent_gates_v2/verify_digests.py",
-      "destination": "scripts/agent_gates_v2/verify_digests.py",
-      "sha256": "39df6e4338d4d12f22b95ae0d7277d5f2899b860bf4953bf77b0706a4d55e6e8"
+      "destination": "scripts/verify_digests.py",
+      "source_sha256": "39df6e4338d4d12f22b95ae0d7277d5f2899b860bf4953bf77b0706a4d55e6e8",
+      "adaptation": "Relocated; imports shared digest_table directly instead of loading old entrypoint. Diagnostic prefix no longer includes implementation version.",
+      "adapted": true
     },
     {
       "source": "tools/agent_gates_v3/test_workflow.py",
-      "destination": "scripts/agent_gates_v3/test_workflow.py",
-      "sha256": "d4a7b21fa03598f5dd44c2420f1aa10d2fb1ca3e9313f3962b474f09af5d3ec9"
+      "destination": "scripts/tests/test_workflow.py",
+      "source_sha256": "d4a7b21fa03598f5dd44c2420f1aa10d2fb1ca3e9313f3962b474f09af5d3ec9",
+      "adaptation": "Relocated; imports and backend loader name updated.",
+      "adapted": true
     },
     {
       "source": "tools/agent_gates_v3/workflow.py",
-      "destination": "scripts/agent_gates_v3/workflow.py",
-      "sha256": "6af2308ff49c2f1c4130d87da3b819774c9fd2eac05e26465797bdb78e77bc9c"
+      "destination": "scripts/workflow.py",
+      "source_sha256": "6af2308ff49c2f1c4130d87da3b819774c9fd2eac05e26465797bdb78e77bc9c",
+      "adaptation": "Relocated; backend loader points at current sibling verify_digests.py. JSONL adapter and workflow contracts preserved.",
+      "adapted": true
     },
     {
       "source": "tools/agent_gates_v3/README.md",
       "destination": "references/workflow-schema.md",
-      "sha256": "0dd2822f574f1e70f95f3660bcdb84f39cf6e3ff41ecc2bfa941e7b5d368af2e",
-      "adapted": true
+      "adapted": true,
+      "source_sha256": "0dd2822f574f1e70f95f3660bcdb84f39cf6e3ff41ecc2bfa941e7b5d368af2e",
+      "adaptation": "Adapted reference documentation for the standalone SCI skill; current paths and versioning policy."
     },
     {
       "source": "tools/agent_gates_v2/README.md",
       "destination": "references/digests-and-snapshots.md",
-      "sha256": "d55f8a931037ea2e896d9a233439af7d7b9fef3b0bb30dca9b28cc447ec4e7c4",
-      "adapted": true
+      "adapted": true,
+      "source_sha256": "d55f8a931037ea2e896d9a233439af7d7b9fef3b0bb30dca9b28cc447ec4e7c4",
+      "adaptation": "Adapted reference documentation for the standalone SCI skill; current paths and versioning policy."
     },
     {
       "source": "docs/AGENT_GATE_PROTOCOL_SCI.md",
       "destination": "references/protocol.md",
-      "sha256": "d549e0758bcb02ba45511bbe641ad89a0711cdb6f9d084bf1521391bd5c75a7f",
-      "adapted": true
+      "adapted": true,
+      "source_sha256": "d549e0758bcb02ba45511bbe641ad89a0711cdb6f9d084bf1521391bd5c75a7f",
+      "adaptation": "Adapted reference documentation for the standalone SCI skill; current paths and versioning policy."
     }
-  ]
+  ],
+  "package_version": "1.0.1",
+  "note": "source_sha256 identifies the original project file at source_commit. Current destination bytes are bound by validation/summary.json. Only the current implementation is bundled; historical source versions remain in Git."
 }

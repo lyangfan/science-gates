@@ -10,15 +10,13 @@ import tempfile
 import unittest
 from unittest import mock
 
-try:
-    from . import workflow as w
-except ImportError:
-    import workflow as w
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+import workflow as w
 
 
 class WorkflowTests(unittest.TestCase):
     def setUp(self):
-        self.temp = tempfile.TemporaryDirectory(prefix="workflow-v3-", dir="/tmp")
+        self.temp = tempfile.TemporaryDirectory(prefix="science-workflow-", dir="/tmp")
         self.addCleanup(self.temp.cleanup)
         self.root = Path(self.temp.name).resolve()
         (self.root / "out").mkdir()
@@ -123,7 +121,7 @@ class WorkflowTests(unittest.TestCase):
             self.manifest["objects"].append({"id": "result", "path": "out/result.txt", "role": "product",
                 "state": "planned", "preservation": "external:fixture", "producer": "validate"})
 
-    def test_valid_manifest_reuses_v2_for_explicit_content(self):
+    def test_valid_manifest_uses_digest_backend_for_explicit_content(self):
         ctx = self.context()
         stats = ctx.check()
         self.assertEqual(stats["content_files"], 1)
@@ -138,7 +136,7 @@ class WorkflowTests(unittest.TestCase):
         self.assertEqual(stats["content_bytes"], len(raw))
 
     def test_jsonl_cannot_hide_snapshot_in_any_row(self):
-        backend = w.load_v2()
+        backend = w.load_digest_backend()
         for schema in (backend.snapshots.SCHEMA, backend.snapshots.LEGACY_SCHEMA):
             for rows in ([{"schema": schema}, {"id": "data"}], [{"id": "data"}, {"schema": schema}]):
                 raw = b"\n".join(json.dumps(row).encode() for row in rows)
@@ -146,13 +144,13 @@ class WorkflowTests(unittest.TestCase):
                     backend.identify_snapshot(raw, "records.jsonl")
 
     def test_jsonl_invalid_or_duplicate_fields_fail_closed(self):
-        backend = w.load_v2()
+        backend = w.load_digest_backend()
         for raw in (b'', b'{"id":"a"}\nnot JSON\n', b'{"id":"a","id":"b"}\n', b'{"id":"a"}\n[]\n', b'# snapshot /tmp/\n'):
             with self.subTest(raw=raw), self.assertRaises(w.WorkflowError):
                 backend.identify_snapshot(raw, "records.ndjson")
 
     def test_jsonl_over_budget_is_rejected(self):
-        backend = w.load_v2()
+        backend = w.load_digest_backend()
         with mock.patch.object(backend, "CONTROL_LIMIT", 10), self.assertRaisesRegex(w.WorkflowError, "exceeds"):
             backend.identify_snapshot(b'{"long":"value"}\n', "records.jsonl")
 
@@ -249,7 +247,7 @@ class WorkflowTests(unittest.TestCase):
 
     def test_unknown_host_rejected_before_backend(self):
         self.manifest["objects"][0]["path"] = "unapproved:/file.txt"
-        with mock.patch.object(w, "load_v2", side_effect=AssertionError("expensive backend")):
+        with mock.patch.object(w, "load_digest_backend", side_effect=AssertionError("expensive backend")):
             with self.assertRaisesRegex(w.WorkflowError, "undeclared"):
                 self.context()
 
@@ -281,7 +279,7 @@ class WorkflowTests(unittest.TestCase):
     def test_existing_output_stops_before_child_or_hashes(self):
         self.step(outputs=True)
         self.write("out/result.txt", b"preserve")
-        with mock.patch.object(w, "load_v2", side_effect=AssertionError("backend called")), \
+        with mock.patch.object(w, "load_digest_backend", side_effect=AssertionError("backend called")), \
                 mock.patch.object(w.subprocess, "run", side_effect=AssertionError("child called")):
             with self.assertRaisesRegex(w.WorkflowError, "already exists"):
                 self.context()
@@ -470,8 +468,8 @@ class WorkflowTests(unittest.TestCase):
                         (self.root / "plan.json").unlink()
                     self.snapshot(str(self.root / "parent"), mode=mode, exclude=excludes)
                     ctx = self.context()
-                    backend = w.load_v2()
-                    with mock.patch.object(w, "load_v2", return_value=backend), \
+                    backend = w.load_digest_backend()
+                    with mock.patch.object(w, "load_digest_backend", return_value=backend), \
                             mock.patch.object(backend.ContentCache, "compute", side_effect=AssertionError("content hashing started")), \
                             mock.patch.object(backend.snapshots, "compare_snapshot", side_effect=AssertionError("directory traversal started")):
                         with self.assertRaisesRegex(w.WorkflowError, "overlaps forbidden subtree"):
@@ -481,8 +479,8 @@ class WorkflowTests(unittest.TestCase):
         (self.root / "safe").mkdir()
         self.snapshot(str(self.root / "safe"), suffix="safe")
         self.snapshot(str(self.root), suffix="root")
-        backend = w.load_v2()
-        with mock.patch.object(w, "load_v2", return_value=backend), \
+        backend = w.load_digest_backend()
+        with mock.patch.object(w, "load_digest_backend", return_value=backend), \
                 mock.patch.object(backend.snapshots, "compare_snapshot", side_effect=AssertionError("early scan")):
             with self.assertRaisesRegex(w.WorkflowError, "overlaps forbidden subtree"):
                 self.context().check()
@@ -498,8 +496,8 @@ class WorkflowTests(unittest.TestCase):
 
     def test_historical_snapshot_parent_does_not_trigger_collection(self):
         self.snapshot(str(self.root), action="historical")
-        backend = w.load_v2()
-        with mock.patch.object(w, "load_v2", return_value=backend), \
+        backend = w.load_digest_backend()
+        with mock.patch.object(w, "load_digest_backend", return_value=backend), \
                 mock.patch.object(backend.snapshots, "compare_snapshot", side_effect=AssertionError("historical scan")):
             self.context().check()
 
@@ -513,8 +511,8 @@ class WorkflowTests(unittest.TestCase):
         self.contract["forbidden_paths"].append("fixture_host:/parent/excluded")
         self.freeze_contract()
         self.snapshot("fixture_host:/parent")
-        backend = w.load_v2()
-        with mock.patch.object(w, "load_v2", return_value=backend), \
+        backend = w.load_digest_backend()
+        with mock.patch.object(w, "load_digest_backend", return_value=backend), \
                 mock.patch.object(backend.ContentCache, "compute", side_effect=AssertionError("content hashing started")), \
                 mock.patch.object(w.subprocess, "run", side_effect=AssertionError("remote call")):
             with self.assertRaisesRegex(w.WorkflowError, "overlaps forbidden subtree"):

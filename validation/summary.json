@@ -1,47 +1,144 @@
 {
   "kind": "author_validation",
+  "package_version": "1.0.1",
   "independent_scientific_pass": false,
   "python": "3.11.14",
   "test_suites": {
-    "legacy": 40,
-    "digests_and_snapshots": 62,
-    "workflow": 61,
-    "science_report_and_integration": 45
+    "test_digest_table.py": 15,
+    "test_science_skill.py": 45,
+    "test_snapshots.py": 29,
+    "test_verify_digests.py": 43,
+    "test_workflow.py": 61
   },
-  "tests_passed": 208,
-  "final_report_suite": "validation/tests-final-report.txt",
+  "tests_passed": 193,
   "full_suite_log": "validation/test-output.txt",
+  "portable_smoke_log": "validation/portable-smoke-release.json",
+  "portable_checks_passed": 8,
+  "consolidation": {
+    "previous_package_commit": "2f4a94258a1ee55bc073ebdf8582f7adb2f5074a",
+    "current_code_directory": "scripts",
+    "removed_version_directories": [
+      "scripts/agent_gates",
+      "scripts/agent_gates_v2",
+      "scripts/agent_gates_v3"
+    ],
+    "extracted_helpers_ast_unchanged": 7,
+    "snapshot_module_byte_identical": true
+  },
   "source_files_unchanged": 12,
+  "source_checks": [
+    {
+      "path": "tools/agent_gates/g_decision_coverage.py",
+      "bytes": 10714,
+      "sha256": "939ba9f077c24ebd4a1fbd3d16e1f8fddcb1b6c7a0fb25ab47a718950f11288f",
+      "matches_recorded_source": true
+    },
+    {
+      "path": "tools/agent_gates/test_verify_digests.py",
+      "bytes": 24332,
+      "sha256": "84c4a0e57d19a4a96fb9cf077d4fc57d6b5e9685f3fee8f321aab74de2c68593",
+      "matches_recorded_source": true
+    },
+    {
+      "path": "tools/agent_gates/verify_digests.py",
+      "bytes": 42538,
+      "sha256": "469c0c9b7774cb8d7cb64d3206db12953070b7248ed55d74d6a37dfc3565b11c",
+      "matches_recorded_source": true
+    },
+    {
+      "path": "tools/agent_gates_v2/snapshots.py",
+      "bytes": 18595,
+      "sha256": "c6622ad092d9045a7977c7579d594ac4566332b7eccae81a5536874557ce7a29",
+      "matches_recorded_source": true
+    },
+    {
+      "path": "tools/agent_gates_v2/test_snapshots.py",
+      "bytes": 16682,
+      "sha256": "876c9012e078eb65be91985259cd666163b5e72c173d5aec8b6a9dbe931e4072",
+      "matches_recorded_source": true
+    },
+    {
+      "path": "tools/agent_gates_v2/test_verify_digests.py",
+      "bytes": 25135,
+      "sha256": "64068722453dd798ee04cb39f6ac949e283b1d8cd226afce772f10c733792106",
+      "matches_recorded_source": true
+    },
+    {
+      "path": "tools/agent_gates_v2/verify_digests.py",
+      "bytes": 24383,
+      "sha256": "39df6e4338d4d12f22b95ae0d7277d5f2899b860bf4953bf77b0706a4d55e6e8",
+      "matches_recorded_source": true
+    },
+    {
+      "path": "tools/agent_gates_v3/test_workflow.py",
+      "bytes": 35383,
+      "sha256": "d4a7b21fa03598f5dd44c2420f1aa10d2fb1ca3e9313f3962b474f09af5d3ec9",
+      "matches_recorded_source": true
+    },
+    {
+      "path": "tools/agent_gates_v3/workflow.py",
+      "bytes": 51080,
+      "sha256": "6af2308ff49c2f1c4130d87da3b819774c9fd2eac05e26465797bdb78e77bc9c",
+      "matches_recorded_source": true
+    },
+    {
+      "path": "tools/agent_gates_v3/README.md",
+      "bytes": 15886,
+      "sha256": "0dd2822f574f1e70f95f3660bcdb84f39cf6e3ff41ecc2bfa941e7b5d368af2e",
+      "matches_recorded_source": true
+    },
+    {
+      "path": "tools/agent_gates_v2/README.md",
+      "bytes": 8775,
+      "sha256": "d55f8a931037ea2e896d9a233439af7d7b9fef3b0bb30dca9b28cc447ec4e7c4",
+      "matches_recorded_source": true
+    },
+    {
+      "path": "docs/AGENT_GATE_PROTOCOL_SCI.md",
+      "bytes": 20697,
+      "sha256": "d549e0758bcb02ba45511bbe641ad89a0711cdb6f9d084bf1521391bd5c75a7f",
+      "matches_recorded_source": true
+    }
+  ],
+  "checked_document_links": 16,
   "broken_document_links": [],
   "artifact_sha256": {
-    "SKILL.md": "693bd29ad2b3450632afe641a0f69c2c17cdb9d4ac7156259676b2c2017b20cb",
-    "README.md": "d9c9f8c842925cf1f430d8428752a21329fda8a956d781082ad23e6fc0d4c6da",
-    "VERSION": "59854984853104df5c353e2f681a15fc7924742f9a2e468c29af248dce45ce03",
-    "assets/report.html": "d77627a0658dc868791b5a09719c9a46e0ad302a159b96c879a891551f49c99f",
+    "README.md": "190061a7a4ac388e70abbaa8d01646de401fe2935f5a2b5df48692a3e3922993",
+    "SKILL.md": "88237b297fbaf829434e0a5a17d9a3ed50456b0318a81b6aed36d8ca79138420",
+    "VERSION": "44e161e4495cac2cf7858043e9e6418e9579f0ddcfae826f9a372622968ce066",
     "agents/openai.yaml": "42deb24784d8350675a5e179d92c1cea3e75e2378dd935bdc35df849b12a8f84",
-    "scripts/agent_gates/g_decision_coverage.py": "939ba9f077c24ebd4a1fbd3d16e1f8fddcb1b6c7a0fb25ab47a718950f11288f",
-    "scripts/agent_gates/test_verify_digests.py": "84c4a0e57d19a4a96fb9cf077d4fc57d6b5e9685f3fee8f321aab74de2c68593",
-    "scripts/agent_gates/verify_digests.py": "469c0c9b7774cb8d7cb64d3206db12953070b7248ed55d74d6a37dfc3565b11c",
-    "scripts/agent_gates_v2/snapshots.py": "c6622ad092d9045a7977c7579d594ac4566332b7eccae81a5536874557ce7a29",
-    "scripts/agent_gates_v2/test_snapshots.py": "876c9012e078eb65be91985259cd666163b5e72c173d5aec8b6a9dbe931e4072",
-    "scripts/agent_gates_v2/test_verify_digests.py": "64068722453dd798ee04cb39f6ac949e283b1d8cd226afce772f10c733792106",
-    "scripts/agent_gates_v2/verify_digests.py": "39df6e4338d4d12f22b95ae0d7277d5f2899b860bf4953bf77b0706a4d55e6e8",
-    "scripts/agent_gates_v3/test_workflow.py": "d4a7b21fa03598f5dd44c2420f1aa10d2fb1ca3e9313f3962b474f09af5d3ec9",
-    "scripts/agent_gates_v3/workflow.py": "6af2308ff49c2f1c4130d87da3b819774c9fd2eac05e26465797bdb78e77bc9c",
-    "scripts/make_example.py": "40ab3fbb5edc7736d2f26ffaf7c6f4aa8980c843a84d5497249646c89dfe4bb9",
-    "scripts/prepare.py": "f6ca60ade039aca1f475a1165479b2d9dbe5fb86675208215250cd3e8bf8687b",
-    "scripts/report.py": "95c5609706a2cb23e0ed9f4b73cb04bb90bcfef2f6f632a7159f18eaf9d371f8",
-    "scripts/run_tests.py": "2186ea38d98ef3cb2f88b7742d87da9c729f980401539e9a9942c050c628708b",
-    "scripts/science.py": "7a1b045b00aab0cc76dd5913f90ce53af957e48f5fa3a198e91ec30007adac08",
-    "scripts/tests/test_science_skill.py": "98a2a32b470f659092cc0f4ea94383ab9c175c4f1b7821c5756682869481b8fe",
-    "references/digests-and-snapshots.md": "5d5cb4700e611addcdf322e00e91b9f34d2054b46b5f474488ba4c885675a392",
+    "assets/report.html": "d77627a0658dc868791b5a09719c9a46e0ad302a159b96c879a891551f49c99f",
+    "output/playwright/desktop-release.png": "c4c0908cdc2bcc4f14db46c945ea869c37ab56db6f132f2a962e4ec4954cfadb",
+    "output/playwright/mobile-release.png": "6823a3553a5d5db0ea1d8c18038a6eec483d4b6d09dcfc1fd455c00e9d51a479",
+    "references/digests-and-snapshots.md": "5b8419756071824d8e0554450225c234780cb7de8e43f444cb9b168aa5a94c4c",
     "references/gate-a.md": "01b7ff3b200142c26646b13f7bda7290dadfac4ac5134a45448ad1d094a119e9",
     "references/gate-b.md": "31c593562f5a8950e1cafa2b3f4eaf46225f1350724feca5386d279c3272933a",
     "references/project-setup.md": "300c2dff5c4edbaa081122a2c111ccddb2cfca699f7e9251c8745f2592b2aceb",
-    "references/protocol.md": "7f87aa62dfc16c1785de2468c1cc19cb772018e638c3b327bafa425d32a8a884",
+    "references/protocol.md": "5e31bd6646f31afbc40bf8abb41e313bb497e5fe03d9d50ff348cb4ecf8abc53",
     "references/report.md": "a861a0fc39b20bdec0fa383556aeb3acae9556714ff4e0cd1f850a07ec3bb4f1",
-    "references/source-provenance.json": "2053adcce304297c57bb462cda632942a09c414c209c1d6a440aaa9857becffa",
-    "references/workflow-schema.md": "dedd9a6c296a5d9df3a15fc46c0481c6ef569b1f0723f5ea80082eb816c70ac1"
+    "references/source-provenance.json": "61546d712d54a311d5f4e96a5cb3850798618843c9985a44d2fd931fb796de90",
+    "references/workflow-schema.md": "6a6fcc8943c2614c7d7eee759caf338e2b56d34b0c561388f75492e417ed83c2",
+    "scripts/digest_table.py": "f25af57ca40275df091d3dafbe246b85d165a10027136f3dde5b0014567da4a4",
+    "scripts/g_decision_coverage.py": "87366c4cc0bceb4f7e39df772827ffb697e5ece8ad1a37742a7027e1eda29a93",
+    "scripts/make_example.py": "40ab3fbb5edc7736d2f26ffaf7c6f4aa8980c843a84d5497249646c89dfe4bb9",
+    "scripts/prepare.py": "f6ca60ade039aca1f475a1165479b2d9dbe5fb86675208215250cd3e8bf8687b",
+    "scripts/report.py": "cc47e4f3baa10125d2dab953e76b7476f4264cedd2ec42cd664c7cd51f6e706c",
+    "scripts/run_tests.py": "5f057575be4ce5cc8155911e7cdf8341bc3f3b4ce207719f378ef3c3c33e17dd",
+    "scripts/science.py": "7a1b045b00aab0cc76dd5913f90ce53af957e48f5fa3a198e91ec30007adac08",
+    "scripts/snapshots.py": "c6622ad092d9045a7977c7579d594ac4566332b7eccae81a5536874557ce7a29",
+    "scripts/tests/test_digest_table.py": "a14aa2d21105a516a00adc73a14251be18ca2baded2fd8af632daa3bdb5e3841",
+    "scripts/tests/test_science_skill.py": "98a2a32b470f659092cc0f4ea94383ab9c175c4f1b7821c5756682869481b8fe",
+    "scripts/tests/test_snapshots.py": "9ef1c3b714508dd26770669ef6bd91bad63508f06dc4165dd32fbbb7d9d85299",
+    "scripts/tests/test_verify_digests.py": "40a26cb9684927c9aeacd3fb7dfc900e29a0120b5c981f39cde781aad442033b",
+    "scripts/tests/test_workflow.py": "56f891bb3dd333f33089f5fc98b580602a94f5ad7db7aaf57045b37eace29d2a",
+    "scripts/verify_digests.py": "697cddb84608f9b5e887f0834a5fc7b8187db78f20047ece50861f595d0157d0",
+    "scripts/workflow.py": "239510e6cc183427ed87e55907cd3550f375a647bf7f0c7fd399236ba7150871",
+    "validation/README.md": "73b7a697a79c54ef146a3f74838422d36c833b63efa0c05bd8ad33f40f3674e0",
+    "validation/browser-mobile.txt": "e6eef0fe1f66aca411edc76b2fbaff58b421da39e98a42abf43f0a73f8894c07",
+    "validation/browser-release.txt": "fd16bbaa56703f2d6c4d51a08a9a8da975e6e5e00cb9f2c57beb97543ad7b75f",
+    "validation/portable-smoke-release.json": "94881f97c27ad6217dbfdfde9fec513cd0ddf71c3b4596f56266a12be38f4d27",
+    "validation/skill-validation.txt": "db349825903d66adffea3ecf1bd8e1803043e8a71cf1a051235dabc5371f5bb0",
+    "validation/test-output.txt": "737564a505d35494489023597905be3ddbfa3a86e5e35b341077d4442552cf71"
   },
   "browser": {
     "desktop_viewport": [
@@ -57,6 +154,10 @@
     "screenshots": {
       "output/playwright/desktop-release.png": "c4c0908cdc2bcc4f14db46c945ea869c37ab56db6f132f2a962e4ec4954cfadb",
       "output/playwright/mobile-release.png": "6823a3553a5d5db0ea1d8c18038a6eec483d4b6d09dcfc1fd455c00e9d51a479"
-    }
+    },
+    "rerun_this_revision": false,
+    "evidence_from_package_commit": "2f4a94258a1ee55bc073ebdf8582f7adb2f5074a",
+    "reuse_basis": "Regenerated synthetic HTML has identical bytes; template bytes unchanged.",
+    "synthetic_html_sha256": "60dad681b187f9dbcbfa206b510f0293fde6d846d82bf0d6dffbe7f46a8a83b7"
   }
 }

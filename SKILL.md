@@ -5,7 +5,7 @@ description: "将科学实验或数据分析任务整理为可执行 spec，进�
 
 # Science Gates
 
-把科学问题、实施合同、真实证据和最终报告连接起来。版本 1.0.0；独立于 ENG。
+把科学问题、实施合同、真实证据和最终报告连接起来。版本 1.0.1；独立于 ENG。
 
 ## 进入任务
 
@@ -41,11 +41,11 @@ description: "将科学实验或数据分析任务整理为可执行 spec，进�
 | scripts/science.py | 新 SCI 链统一的 render / check / run / record，强制报告合同和最终报告验收 |
 | scripts/report.py | 从小型结果表生成离线 HTML；核查覆盖、来源、图表和实际 HTML 字节 |
 | scripts/prepare.py | 根据明确的文件清单生成摘要；仅填 null，不刷新已有冻结值 |
-| scripts/agent_gates/g_decision_coverage.py | 核决定状态、落点与明确的计数断言 |
-| scripts/agent_gates_v2/verify_digests.py | 摘要表、Git 对象及显式目录巡检；默认避免全量目录内容快照 |
+| scripts/g_decision_coverage.py | 核决定状态、落点与明确的计数断言 |
+| scripts/verify_digests.py | 摘要表、Git 对象及显式目录巡检；默认避免全量目录内容快照 |
 
 参数、schema 和信任边界见 [工作流格式](references/workflow-schema.md)、
-[摘要与目录巡检](references/digests-and-snapshots.md)。底层兼容脚本用于复用核验逻辑，
+[摘要与目录巡检](references/digests-and-snapshots.md)。scripts/ 下仅保留当前实现，按功能分模块，
 新链统一走 science.py，不能绕过其报告要求来取得完整门 B 通过。
 
 报告模板在 assets/report.html；scripts/make_example.py 会在指定的独占目录生成明确标为

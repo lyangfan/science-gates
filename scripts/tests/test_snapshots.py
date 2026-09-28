@@ -11,10 +11,8 @@ import tempfile
 import unittest
 from unittest import mock
 
-try:
-    from . import snapshots
-except ImportError:
-    import snapshots
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+import snapshots
 
 
 class SnapshotTests(unittest.TestCase):

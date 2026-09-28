@@ -1,6 +1,6 @@
-"""SCI v2 摘要核验的 CLI 合同；所有 fixture 和 Git 写操作均限 /tmp。
+"""SCI 摘要核验的 CLI 合同；所有 fixture 和 Git 写操作均限 /tmp。
 
-运行：python3 -B -m unittest discover -s tools/agent_gates_v2 \
+运行：python3 -B -m unittest discover -s scripts/tests \
     -p 'test_verify_digests.py' -v
 
 假 ssh 只记录调用并失败，测试从不连接网络。该记录用于证明先决检查失败后
@@ -22,8 +22,9 @@ import unittest
 from unittest.mock import patch
 
 
-CHECKER = Path(__file__).with_name("verify_digests.py").resolve()
-_CORE_SPEC = importlib.util.spec_from_file_location("gate_v2_checker_under_test", CHECKER)
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+CHECKER = Path(__file__).resolve().parents[1] / "verify_digests.py"
+_CORE_SPEC = importlib.util.spec_from_file_location("digest_checker_under_test", CHECKER)
 CORE = importlib.util.module_from_spec(_CORE_SPEC)
 _CORE_SPEC.loader.exec_module(CORE)
 
@@ -32,9 +33,9 @@ def digest(value: str | bytes) -> str:
     return hashlib.sha256(value.encode() if isinstance(value, str) else value).hexdigest()
 
 
-class VerifyDigestsV2Tests(unittest.TestCase):
+class VerifyDigestsTests(unittest.TestCase):
     def setUp(self):
-        self.temp = tempfile.TemporaryDirectory(prefix="agent-gates-v2-check-", dir="/tmp")
+        self.temp = tempfile.TemporaryDirectory(prefix="science-digests-check-", dir="/tmp")
         self.addCleanup(self.temp.cleanup)
         self.root = Path(self.temp.name).resolve()
         self.dispatch = "reviews/dispatch-b1.md"
@@ -44,11 +45,11 @@ class VerifyDigestsV2Tests(unittest.TestCase):
         self.env = dict(
             os.environ,
             GIT_CONFIG_NOSYSTEM="1", GIT_CONFIG_GLOBAL=os.devnull,
-            GIT_AUTHOR_NAME="Gate V2 Test", GIT_AUTHOR_EMAIL="gate@example.invalid",
-            GIT_COMMITTER_NAME="Gate V2 Test", GIT_COMMITTER_EMAIL="gate@example.invalid",
-            PYTHONDONTWRITEBYTECODE="1", V2_TEST_SSH_LOG=str(self.ssh_log),
+            GIT_AUTHOR_NAME="SCI Digest Test", GIT_AUTHOR_EMAIL="gate@example.invalid",
+            GIT_COMMITTER_NAME="SCI Digest Test", GIT_COMMITTER_EMAIL="gate@example.invalid",
+            PYTHONDONTWRITEBYTECODE="1", SCI_TEST_SSH_LOG=str(self.ssh_log),
         )
-        self.write("bin/ssh", '#!/bin/sh\nprintf "%s\\n" "$*" >> "$V2_TEST_SSH_LOG"\nexit 81\n')
+        self.write("bin/ssh", '#!/bin/sh\nprintf "%s\\n" "$*" >> "$SCI_TEST_SSH_LOG"\nexit 81\n')
         (self.root / "bin/ssh").chmod(0o755)
         self.env["PATH"] = str(self.root / "bin") + os.pathsep + self.env.get("PATH", "")
         self.git("init", "-q")
@@ -494,6 +495,113 @@ class VerifyDigestsV2Tests(unittest.TestCase):
         self.assertNotIn("TOOL_ERROR", output)
         self.assertNotIn("AttributeError", output)
         self.assert_no_target_read()
+
+
+    def test_missing_fixed_blob_cannot_pass_via_live_input(self):
+        self.table([self.row("code/model.py", preservation="git:code/missing.py")])
+        fixed = self.commit()
+        self.assert_mismatch(self.check("--commit", fixed))
+
+    def test_missing_or_empty_preservation_is_rejected(self):
+        for declaration in ("", "external:", "unrecognized"):
+            with self.subTest(declaration=declaration):
+                self.table([self.row("code/model.py", preservation=declaration)])
+                self.assert_rejected(self.check("--precommit"), "BAD_PRESERVATION")
+
+    def test_ignored_file_requires_explicit_external_basis_or_fixed_blob(self):
+        self.write(".gitignore", "external.txt\n")
+        self.write("external.txt", "external input\n")
+        self.table([self.row("external.txt")])
+        fixed = self.commit()
+        self.assert_mismatch(self.check("--commit", fixed))
+        self.table([self.row("external.txt", preservation="external:authorized input")])
+        fixed = self.commit()
+        self.assert_pass(self.check("--commit", fixed))
+
+    def test_remote_mapping_checks_live_bytes_and_local_canonical(self):
+        remote = "mirror:/srv/model.py"
+        value = digest("candidate v1\n")
+        self.table([(remote, value, "git:code/model.py")])
+        fixed = self.commit()
+        values = [{"path": "/srv/model.py", "sha256": value, "size": len("candidate v1\n")}]
+        with patch.object(CORE, "remote_content", return_value=values) as fetch:
+            self.assert_pass(self.inprocess_check("--precommit"))
+            self.assert_pass(self.inprocess_check("--commit", fixed))
+            self.assertEqual(("mirror", ["/srv/model.py"]), fetch.call_args.args)
+            self.write("code/model.py", "changed local canonical\n")
+            self.assert_mismatch(self.inprocess_check("--precommit"))
+        changed = [{"path": "/srv/model.py", "sha256": digest("remote changed"), "size": 14}]
+        with patch.object(CORE, "remote_content", return_value=changed):
+            self.assert_mismatch(self.inprocess_check("--commit", fixed))
+        self.assert_no_target_read()
+
+    def test_git_patch_tracks_add_delete_rename_binary_and_unicode(self):
+        self.write("old.txt", "rename content\n")
+        self.write("deleted.txt", "delete content\n")
+        self.write("binary.dat", b"\x00before")
+        first = self.commit()
+        (self.root / "old.txt").rename(self.root / "renamed.txt")
+        (self.root / "deleted.txt").unlink()
+        self.write("新增.txt", "new content\n")
+        self.write("binary.dat", b"\x00after")
+        second = self.commit()
+        expected = {"old.txt", "renamed.txt", "deleted.txt", "新增.txt", "binary.dat"}
+        for mode in ("--no-renames", "--find-renames"):
+            with self.subTest(mode=mode):
+                raw = (self.git("diff", mode, "--binary", "--full-index", first, second) + "\n").encode()
+                self.assertEqual(expected, CORE.patch_touched_bytes(raw))
+        patch_path = "reviews/changes.patch"
+        self.write(patch_path, raw)
+        self.table([self.row("code/model.py"), self.row(patch_path)])
+        self.assert_pass(self.check("--precommit", "--diff", patch_path, "--claimed-changed", ",".join(sorted(expected))))
+        self.assert_rejected(self.check("--precommit", "--diff", patch_path, "--claimed-changed", "code/model.py"),
+                             "CLAIMED_BUT_NOT_IN_DIFF")
+
+    def test_patch_hunk_cannot_invent_a_claimed_path(self):
+        raw = (b"diff --git a/real.txt b/real.txt\n--- a/real.txt\n+++ b/real.txt\n@@ -1 +1 @@\n"
+               b"--- a/not-actually-changed.txt\n+++ b/not-actually-changed.txt\n")
+        self.assertEqual({"real.txt"}, CORE.patch_touched_bytes(raw))
+
+    def test_placeholder_write_preserves_binding_column(self):
+        self.table([("code/model.py", "<脚本填>", "git")])
+        self.assert_pass(self.cli("write", self.dispatch))
+        self.assertIn("| git |", (self.root / self.dispatch).read_text())
+        self.assert_pass(self.check("--precommit"))
+
+
+class RemoteBatchTests(unittest.TestCase):
+    def paths(self):
+        return [f"/data/个体'quoted-{index}-" + "数" * 70 + ".csv" for index in range(220)]
+
+    def test_long_unicode_paths_preserve_every_input_and_bound_requests(self):
+        paths = self.paths()
+        batches = list(CORE.remote_batches(paths))
+        self.assertGreater(len(batches), 1)
+        self.assertEqual(paths, [path for batch in batches for path in batch])
+        self.assertTrue(all(len(json.dumps(batch).encode()) <= 65536 for batch in batches))
+        with self.assertRaises(RuntimeError):
+            list(CORE.remote_batches(["/" + "数" * 20000]))
+
+    def test_missing_file_does_not_drop_later_batches(self):
+        paths = self.paths()
+        def fetch(host, batch):
+            self.assertEqual("probe.invalid", host)
+            return [{"path": path, "sha256": None} if path == paths[0]
+                    else {"path": path, "sha256": digest(path), "size": 1} for path in batch]
+        with patch.object(CORE, "remote_content", side_effect=fetch) as fetch_mock:
+            result = CORE.ContentCache().compute(["probe.invalid:" + path for path in paths])
+        self.assertGreater(fetch_mock.call_count, 1)
+        self.assertEqual(len(paths), len(result))
+        self.assertIsNone(result["probe.invalid:" + paths[0]])
+        self.assertEqual(digest(paths[-1]), result["probe.invalid:" + paths[-1]])
+
+    def test_later_batch_error_cannot_return_partial_success(self):
+        paths = self.paths()
+        first = list(CORE.remote_batches(paths))[0]
+        values = [{"path": path, "sha256": digest(path), "size": 1} for path in first]
+        with patch.object(CORE, "remote_content", side_effect=[values, RuntimeError("remote failed")]), \
+                self.assertRaisesRegex(RuntimeError, "remote failed"):
+            CORE.ContentCache().compute(["probe.invalid:" + path for path in paths])
 
 
 if __name__ == "__main__":

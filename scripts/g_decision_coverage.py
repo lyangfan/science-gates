@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""g_decision_coverage —— AGENT GATE PROTOCOL v3 §4 预检：上游决策覆盖（A1 的机械半）。
+"""g_decision_coverage —— SCI 门 A 预检：上游决策覆盖（A1 的机械半）。
 
 断言：
 - 上游已拍板的编号 ⊆ 下游落点表（防「漏落地」）；
@@ -42,7 +42,7 @@ def find(pattern: str | None, text: str) -> set[str]:
 
 
 def main() -> int:
-    ap = argparse.ArgumentParser(description="上游决策覆盖（v3 §4 预检）")
+    ap = argparse.ArgumentParser(description="上游决策覆盖（SCI 门 A 预检）")
     ap.add_argument("--upstream", required=True, nargs="+",
                     help="上游决策文档，可多份 —— 工程链常有设计稿 / 详细合同 / 决策 draft / "
                          "对话文档多个上游。多份时取并集，「每编号恰好一个当前状态」因此能跨文件生效："

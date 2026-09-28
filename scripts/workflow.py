@@ -2,7 +2,8 @@
 """SCI workflow facts and candidate records; never a scientific Reviewer.
 
 All control inputs are externally SHA-pinned. The acceptance source independently
-defines the complete check-ID set. Existing v2 code remains a read-only dependency.
+defines the complete check-ID set. Digest and snapshot checks use the bundled
+current backend.
 """
 from __future__ import annotations
 
@@ -142,15 +143,16 @@ def remote_path(path, allowed_hosts):
     return path
 
 
-def load_v2():
-    path = Path(__file__).resolve().parents[1] / "agent_gates_v2" / "verify_digests.py"
-    spec = importlib.util.spec_from_file_location("workflow_v2_backend", path)
+def load_digest_backend():
+    path = Path(__file__).with_name("verify_digests.py")
+    spec = importlib.util.spec_from_file_location("workflow_digest_backend", path)
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
     original_identify = module.identify_snapshot
 
     def identify_with_jsonl(raw, path):
-        # The frozen backend treats every leading object as one JSON document.
+        # Validate scientific JSONL on the same authenticated bytes. Each loader
+        # instance owns this adapter without mutating a shared module.
         # JSONL is a data format, never a way to hide a snapshot from its plan.
         if Path(path).suffix.lower() in {".jsonl", ".ndjson"}:
             require(len(raw) <= module.CONTROL_LIMIT, "JSONL exceeds 32 MiB: " + str(path))
@@ -371,7 +373,7 @@ class Context:
         return path if ":" in path else str(safe_local(self.root, path).resolve())
 
     def output_path(self, path, *, must_be_new=True):
-        require(":" not in path, "v1 runner only creates local outputs; remote execution is not a hidden SSH action")
+        require(":" not in path, "runner only creates local outputs; remote execution is not a hidden SSH action")
         self.path(path)
         require(any(below(path, prefix) for prefix in self.contract["write_roots"]), "output outside authorized write roots")
         require(not must_be_new or not os.path.lexists(safe_local(self.root, path)), "output already exists: " + path, 1)
@@ -564,7 +566,7 @@ class Context:
 
     def check(self, commit=None):
         """Verify the explicitly listed current content, never the whole spec tree."""
-        backend = load_v2()
+        backend = load_digest_backend()
         cache = backend.ContentCache()
         controls = [(self.manifest_path, self.manifest_sha256),
                     (self.manifest["contract"]["path"], self.contract_sha256),
@@ -576,9 +578,9 @@ class Context:
         present = [obj for obj in self.objects.values() if obj["state"] == "present"]
         paths = [obj["path"] if ":" in obj["path"] else str(self.root / obj["path"]) for obj in present]
         if commit:
-            backend.base.validate_commit(str(self.root), commit)
+            backend.table.validate_commit(str(self.root), commit)
             for path, expected in controls:
-                rel = backend.base.repository_path(str(self.root), str(self.root / path), source=True)
+                rel = backend.table.repository_path(str(self.root), str(self.root / path), source=True)
                 require(cache.blob(str(self.root), commit, rel) == expected, "control is not bound to supplied commit: " + path, 1)
         bindings = {obj["id"]: backend.binding(str(self.root), path, obj["preservation"]) for obj, path in zip(present, paths)}
         values = cache.compute(paths)
@@ -642,7 +644,7 @@ def render(ctx):
 def run_step(ctx, step_id, receipt_dir):
     require(step_id in ctx.steps, "unknown step")
     step = ctx.steps[step_id]
-    require(step["host"] == "local", "run v1 is local-only; it does not submit or wrap remote jobs", 2)
+    require(step["host"] == "local", "run is local-only; it does not submit or wrap remote jobs", 2)
     if step["kind"] == "scientific":
         require(ctx.manifest["stage"] == "execute" and ctx.contract["scope"] == "full_chain", "scientific execution is forbidden in this stage/scope")
         ctx.permit(step["inputs"])
@@ -673,7 +675,7 @@ def run_step(ctx, step_id, receipt_dir):
     outputs = []
     complete = rc == 0
     integrity_failure = False
-    cache = load_v2().ContentCache()
+    cache = load_digest_backend().ContentCache()
     for oid in step["outputs"]:
         obj = ctx.objects[oid]
         try:
@@ -715,8 +717,8 @@ def record(ctx, report_path, report_sha256):
     require(stable_read(dispatch_path, report["dispatch"]["sha256"]) == render(ctx), "review dispatch is not the deterministic manifest projection", 1)
     if "dispatch_commit" in report:
         require(isinstance(report["dispatch_commit"], str) and bool(COMMIT.fullmatch(report["dispatch_commit"])), "invalid dispatch commit")
-        backend = load_v2()
-        backend.base.validate_commit(str(ctx.root), report["dispatch_commit"])
+        backend = load_digest_backend()
+        backend.table.validate_commit(str(ctx.root), report["dispatch_commit"])
         require(backend.ContentCache().blob(str(ctx.root), report["dispatch_commit"], report["dispatch"]["path"]) == report["dispatch"]["sha256"], "dispatch commit mismatch", 1)
     require(isinstance(report["checks"], list) and bool(report["checks"]), "empty review checks")
     checked = set()

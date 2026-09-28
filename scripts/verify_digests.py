@@ -1,14 +1,13 @@
 #!/usr/bin/env python3
-"""SCI v2 核验：表列内容身份与显式目录巡检分离；旧冻结入口保持不变。
+"""SCI 核验：表列内容身份与显式目录巡检分离。
 
 退出码沿用 0 PASS / 1 FAIL / 2 TOOL_ERROR / 3 NOT_VERIFIABLE。
-运行位置与旧工具一致：仓库根目录。仅 write/snapshot 写指定目标。
+运行位置：待核项目的仓库根目录。仅 write/snapshot 写指定目标。
 """
 from __future__ import annotations
 
 import argparse
 import hashlib
-import importlib.util
 import json
 import os
 from pathlib import Path
@@ -20,11 +19,7 @@ import sys
 import time
 
 sys.dont_write_bytecode = True
-BASE_PATH = Path(__file__).resolve().parents[1] / "agent_gates" / "verify_digests.py"
-_spec = importlib.util.spec_from_file_location("frozen_digest_parser", BASE_PATH)
-base = importlib.util.module_from_spec(_spec)
-_spec.loader.exec_module(base)
-sys.path.insert(0, str(Path(__file__).resolve().parent))
+import digest_table as table
 import snapshots
 
 PASS, FAIL, TOOL_ERROR, NOT_VERIFIABLE = 0, 1, 2, 3
@@ -95,7 +90,7 @@ class ContentCache:
     def compute(self, paths):
         result, hosts = {}, {}
         for path in dict.fromkeys(paths):
-            host, p = base.split_remote(path)
+            host, p = table.split_remote(path)
             if host is None:
                 result[path] = self.local(p)
             else:
@@ -165,7 +160,7 @@ def remote_content(host, paths):
     if not isinstance(values, list) or [x.get("path") for x in values] != paths:
         raise RuntimeError("远端结果不完整、重复或顺序不符")
     for x in values:
-        if x.get("sha256") is not None and (not base.HEX.fullmatch(x["sha256"]) or
+        if x.get("sha256") is not None and (not table.HEX.fullmatch(x["sha256"]) or
                                            not isinstance(x.get("size"), int)):
             raise RuntimeError("远端摘要格式错误")
     return values
@@ -219,7 +214,7 @@ class IntegrityMismatch(ValueError):
 
 
 def authenticated(raw, path, listed):
-    matching = [v for p, v in listed.items() if base.split_remote(p)[0] is None
+    matching = [v for p, v in listed.items() if table.split_remote(p)[0] is None
                 and os.path.abspath(p) == os.path.abspath(path)]
     actual = hashlib.sha256(raw).hexdigest()
     if not matching or any(v != actual for v in matching):
@@ -233,13 +228,13 @@ def worst(codes):
 
 
 def binding(root, path, declaration):
-    host, _ = base.split_remote(path)
+    host, _ = table.split_remote(path)
     if declaration.startswith("external:") and declaration[len("external:"):].strip():
         return None
     if declaration == "git" and host is None:
-        return base.repository_path(root, path, source=True)
+        return table.repository_path(root, path, source=True)
     if declaration.startswith("git:"):
-        return base.repository_path(root, declaration[len("git:"):])
+        return table.repository_path(root, declaration[len("git:"):])
     raise ValueError("保全须为 git / git:<本地路径> / external:<依据>；远端须显式映射")
 
 
@@ -291,7 +286,7 @@ def load_plan(path, listed, hints):
             raise ValueError("存在快照行但未提供 --snapshot-plan；未执行目录巡检")
         return []
     canonical = lambda p: os.path.abspath(p)
-    allowed = {canonical(p) for p in listed if base.split_remote(p)[0] is None}
+    allowed = {canonical(p) for p in listed if table.split_remote(p)[0] is None}
     if canonical(path) not in allowed:
         raise ValueError("snapshot-plan 本身必须列入同一派发摘要表")
     raw = authenticated(read_control(path, 1024 * 1024), path, listed)
@@ -303,7 +298,7 @@ def load_plan(path, listed, hints):
         if not isinstance(e, dict) or not isinstance(e.get("baseline"), str):
             raise ValueError("plan 缺 baseline")
         p = canonical(e["baseline"])
-        if base.split_remote(e["baseline"])[0] is not None or p not in allowed or p in seen:
+        if table.split_remote(e["baseline"])[0] is not None or p not in allowed or p in seen:
             raise ValueError("plan baseline 未列入派发、重复或不是本地清单")
         seen.add(p)
         if e.get("action") not in ("verify", "historical"):
@@ -316,19 +311,19 @@ def load_plan(path, listed, hints):
 
 
 def check_one(md, args, cache):
-    print(f"### verify_digests_v2 check · {md}")
+    print(f"### verify_digests check · {md}")
     if not Path(md).is_file():
         print("MISSING_FILE"); return NOT_VERIFIABLE
     raw = Path(md).read_bytes()
     text = raw.decode("utf-8")
-    root = base.git_repository(md) if args.precommit or args.commit else None
+    root = table.git_repository(md) if args.precommit or args.commit else None
     if args.commit:
-        base.validate_commit(root, args.commit)
-        kept = cache.blob(root, args.commit, base.repository_path(root, md, source=True))
+        table.validate_commit(root, args.commit)
+        kept = cache.blob(root, args.commit, table.repository_path(root, md, source=True))
         if kept != hashlib.sha256(raw).hexdigest():
             print("DISPATCH_COMMIT_MISMATCH：未消费派发白名单"); return FAIL
         print("DISPATCH_COMMIT_OK")
-    rows, skipped, fenced = base.parse_rows(text, args.last, args.digest_col)
+    rows, skipped, fenced = table.parse_rows(text, args.last, args.digest_col)
     lines = text.splitlines()
     codes, targets, bindings, hints = [], {}, {}, []
     snapshot_raw, baselines = {}, {}
@@ -344,14 +339,14 @@ def check_one(md, args, cache):
         if not regex.search(head):
             print("LAST_TABLE_NOT_EXPECTED_SECTION"); codes.append(NOT_VERIFIABLE)
     for i, path, value in rows:
-        if base.PLACEHOLDER.fullmatch(value):
+        if table.PLACEHOLDER.fullmatch(value):
             print(f"UNFILLED {path}"); codes.append(NOT_VERIFIABLE)
-        elif not base.HEX.fullmatch(value):
+        elif not table.HEX.fullmatch(value):
             print(f"BAD_DIGEST {path}"); codes.append(FAIL)
         if path in targets and targets[path] != value:
             print(f"CONFLICTING_DIGEST {path}"); codes.append(FAIL)
         targets[path] = value
-        host, p = base.split_remote(path)
+        host, p = table.split_remote(path)
         if host is None:
             if not os.path.isfile(p):
                 print(f"MISSING_OR_NOT_FILE {path}"); codes.append(NOT_VERIFIABLE)
@@ -364,7 +359,7 @@ def check_one(md, args, cache):
                 except (ValueError, RuntimeError, OSError) as e:
                     print(f"SNAPSHOT_FORMAT_ERROR {path}: {e}"); codes.append(NOT_VERIFIABLE)
         if root:
-            cells = base.split_cells(lines[i])
+            cells = table.split_cells(lines[i])
             declaration = cells[args.digest_col].strip("` ") if len(cells) > args.digest_col else ""
             try:
                 rel = binding(root, path, declaration)
@@ -380,7 +375,7 @@ def check_one(md, args, cache):
         if not args.diff or not Path(args.diff).is_file():
             print("TOOL_ERROR: claimed-changed 缺有效 diff"); codes.append(TOOL_ERROR)
         else:
-            listed_local = {os.path.abspath(p) for p in targets if base.split_remote(p)[0] is None}
+            listed_local = {os.path.abspath(p) for p in targets if table.split_remote(p)[0] is None}
             if os.path.abspath(args.diff) not in listed_local:
                 print("MISSING_REQUIRED_ROW: diff 必须列入派发摘要表")
                 codes.append(NOT_VERIFIABLE)
@@ -432,7 +427,7 @@ def check_one(md, args, cache):
     # 不从路径重读内容，不允许分类期间的文件替换绕过计划要求。
     planned = {os.path.abspath(e["baseline"]) for e in entries}
     for path in targets:
-        if base.split_remote(path)[0] is None:
+        if table.split_remote(path)[0] is None:
             observed = cache.snapshot_view(path)
             if observed is not None and os.path.abspath(path) not in planned:
                 print(f"SNAPSHOT_PLAN_ERROR: authenticated snapshot omitted from plan: {path}")
@@ -459,13 +454,13 @@ def cmd_write(md, cache):
     p = Path(md)
     raw = p.read_bytes()
     text = raw.decode("utf-8")
-    rows, skipped, _ = base.parse_rows(text)
+    rows, skipped, _ = table.parse_rows(text)
     if not rows or skipped:
         print(f"NOT_VERIFIABLE: 无表或存在未解析行 {skipped}"); return NOT_VERIFIABLE
-    pending = [(i, path, value) for i, path, value in rows if base.PLACEHOLDER.fullmatch(value)]
+    pending = [(i, path, value) for i, path, value in rows if table.PLACEHOLDER.fullmatch(value)]
     if not pending:
         print("write: 0 占位符；未读输入，文件字节保持不变"); return PASS
-    state = base.git_state(md)
+    state = table.git_state(md)
     if state == "clean":
         print("REFUSED: 已提交且未改动的文档不可回填"); return FAIL
     if state == "?":
@@ -533,7 +528,7 @@ def main(argv=None):
         print(f"TOOL_ERROR: {type(e).__name__}: {e}")
         code = TOOL_ERROR
     print("metrics: " + json.dumps({**cache.stats, "elapsed_seconds": round(time.monotonic()-started, 3)}, sort_keys=True))
-    print(f"verify_digests_v2: {NAMES[code]}")
+    print(f"verify_digests: {NAMES[code]}")
     return code
 
 

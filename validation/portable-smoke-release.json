@@ -1,19 +1,121 @@
 {
-  "argv": [
-    "python3.11",
-    "-B",
-    "/Users/liuyangfan/Documents/work/science-gates/scripts/science.py",
-    "check",
-    "reviews/stage.json",
-    "--root",
-    "/tmp/science-gates-demo-20260928/release",
-    "--manifest-sha256",
-    "540e864a62ed40fbd24f9ac664b15eaf855e5a768c452ecc7b97dfab5ef90f5a",
-    "--contract-sha256",
-    "d259671abbf32da0ce970dc196767c152708bdeb80a5fe2643c8f94b8206b34c"
+  "kind": "author_portability_check",
+  "scientific_pass": false,
+  "package_version": "1.0.1",
+  "copied_package": "/private/var/folders/_f/zcly_6490514rj6wnsjfl2z80000gn/T/science-gates-current-e4uum1oo/skill copy",
+  "package_subdirectories": [
+    "assets",
+    "scripts",
+    "scripts/tests"
   ],
-  "cwd": "/tmp",
-  "returncode": 0,
-  "stdout": "{\"result\": \"MECHANICAL_OK\", \"scientific_pass\": false, \"stage\": \"addendum\", \"scope\": \"scoped_addendum\", \"report\": {\"schema\": \"science-gates.report-check.v1\", \"status\": \"MECHANICAL_OK\", \"scientific_pass\": false, \"source\": {\"path\": \"report-source.json\", \"sha256\": \"72a4b471361bfe83e3ecb0b62aacd2d14d4a7f0270608f9957c1362164587949\"}, \"contract\": {\"path\": \"reviews/report-contract.json\", \"sha256\": \"603ff396bf86cf3f8fd62aea0fee5f0f9f4a71137d9f4c0b4c802555aa595518\"}, \"html\": {\"path\": \"demo.html\", \"sha256\": \"60dad681b187f9dbcbfa206b510f0293fde6d846d82bf0d6dffbe7f46a8a83b7\"}, \"template_sha256\": \"d77627a0658dc868791b5a09719c9a46e0ad302a159b96c879a891551f49c99f\", \"analyses\": [{\"id\": \"EXP1\", \"status\": \"completed\"}], \"required_independent_checks\": [\"RPT-COVERAGE\", \"RPT-METHODS\", \"RPT-RESULTS\", \"RPT-VISUALS\", \"RPT-CONCLUSIONS\", \"RPT-PROVENANCE\"], \"stats\": {\"source_files\": 2, \"source_bytes\": 114, \"rows\": 8, \"control_bytes\": 3750, \"elapsed_seconds\": 0.000918}}, \"stats\": {\"content_files\": 6, \"content_bytes\": 15020, \"cache_hits\": 0, \"git_blobs\": 0, \"git_blob_bytes\": 0}}\n",
-  "stderr": ""
+  "synthetic_html": {
+    "sha256": "60dad681b187f9dbcbfa206b510f0293fde6d846d82bf0d6dffbe7f46a8a83b7",
+    "matches_pre_consolidation_html": true
+  },
+  "checks": [
+    {
+      "argv": [
+        "/Users/liuyangfan/.local/bin/python3.11",
+        "-B",
+        "/private/var/folders/_f/zcly_6490514rj6wnsjfl2z80000gn/T/science-gates-current-e4uum1oo/skill copy/scripts/make_example.py",
+        "--out",
+        "/private/var/folders/_f/zcly_6490514rj6wnsjfl2z80000gn/T/science-gates-current-e4uum1oo/sample project"
+      ],
+      "cwd": "/private/var/folders/_f/zcly_6490514rj6wnsjfl2z80000gn/T/science-gates-current-e4uum1oo",
+      "returncode": 0,
+      "stdout": "{\"root\": \"/private/var/folders/_f/zcly_6490514rj6wnsjfl2z80000gn/T/science-gates-current-e4uum1oo/sample project\", \"html\": \"/private/var/folders/_f/zcly_6490514rj6wnsjfl2z80000gn/T/science-gates-current-e4uum1oo/sample project/demo.html\", \"identities\": \"/private/var/folders/_f/zcly_6490514rj6wnsjfl2z80000gn/T/science-gates-current-e4uum1oo/sample project/example-identities.json\", \"scientific_pass\": false}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "/Users/liuyangfan/.local/bin/python3.11",
+        "-B",
+        "/private/var/folders/_f/zcly_6490514rj6wnsjfl2z80000gn/T/science-gates-current-e4uum1oo/skill copy/scripts/science.py",
+        "check",
+        "reviews/stage.json",
+        "--root",
+        "/private/var/folders/_f/zcly_6490514rj6wnsjfl2z80000gn/T/science-gates-current-e4uum1oo/sample project",
+        "--manifest-sha256",
+        "a8598da8fbe09f5aeffe1bafbc731d97067c6f15e7d0451f5b2bbbd385480a2e",
+        "--contract-sha256",
+        "d259671abbf32da0ce970dc196767c152708bdeb80a5fe2643c8f94b8206b34c"
+      ],
+      "cwd": "/private/var/folders/_f/zcly_6490514rj6wnsjfl2z80000gn/T/science-gates-current-e4uum1oo",
+      "returncode": 0,
+      "stdout": "{\"result\": \"MECHANICAL_OK\", \"scientific_pass\": false, \"stage\": \"addendum\", \"scope\": \"scoped_addendum\", \"report\": {\"schema\": \"science-gates.report-check.v1\", \"status\": \"MECHANICAL_OK\", \"scientific_pass\": false, \"source\": {\"path\": \"report-source.json\", \"sha256\": \"72a4b471361bfe83e3ecb0b62aacd2d14d4a7f0270608f9957c1362164587949\"}, \"contract\": {\"path\": \"reviews/report-contract.json\", \"sha256\": \"603ff396bf86cf3f8fd62aea0fee5f0f9f4a71137d9f4c0b4c802555aa595518\"}, \"html\": {\"path\": \"demo.html\", \"sha256\": \"60dad681b187f9dbcbfa206b510f0293fde6d846d82bf0d6dffbe7f46a8a83b7\"}, \"template_sha256\": \"d77627a0658dc868791b5a09719c9a46e0ad302a159b96c879a891551f49c99f\", \"analyses\": [{\"id\": \"EXP1\", \"status\": \"completed\"}], \"required_independent_checks\": [\"RPT-COVERAGE\", \"RPT-METHODS\", \"RPT-RESULTS\", \"RPT-VISUALS\", \"RPT-CONCLUSIONS\", \"RPT-PROVENANCE\"], \"stats\": {\"source_files\": 2, \"source_bytes\": 114, \"rows\": 8, \"control_bytes\": 3750, \"elapsed_seconds\": 0.000605}}, \"stats\": {\"content_files\": 6, \"content_bytes\": 15020, \"cache_hits\": 0, \"git_blobs\": 0, \"git_blob_bytes\": 0}}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "/Users/liuyangfan/.local/bin/python3.11",
+        "-B",
+        "/private/var/folders/_f/zcly_6490514rj6wnsjfl2z80000gn/T/science-gates-current-e4uum1oo/skill copy/scripts/science.py",
+        "--help"
+      ],
+      "cwd": "/private/var/folders/_f/zcly_6490514rj6wnsjfl2z80000gn/T/science-gates-current-e4uum1oo",
+      "returncode": 0,
+      "stdout": "usage: science.py [-h] [--root ROOT] --manifest-sha256 MANIFEST_SHA256\n                  --contract-sha256 CONTRACT_SHA256 [--out OUT]\n                  [--commit COMMIT] [--step STEP] [--receipt-dir RECEIPT_DIR]\n                  [--review REVIEW] [--review-sha256 REVIEW_SHA256]\n                  {render,check,run,record} manifest\n\nSCI entrypoint: workflow mechanics plus the mandatory scientific HTML\ncontract.\n\npositional arguments:\n  {render,check,run,record}\n  manifest\n\noptions:\n  -h, --help            show this help message and exit\n  --root ROOT\n  --manifest-sha256 MANIFEST_SHA256\n  --contract-sha256 CONTRACT_SHA256\n  --out OUT\n  --commit COMMIT\n  --step STEP\n  --receipt-dir RECEIPT_DIR\n  --review REVIEW\n  --review-sha256 REVIEW_SHA256\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "/Users/liuyangfan/.local/bin/python3.11",
+        "-B",
+        "/private/var/folders/_f/zcly_6490514rj6wnsjfl2z80000gn/T/science-gates-current-e4uum1oo/skill copy/scripts/report.py",
+        "--help"
+      ],
+      "cwd": "/private/var/folders/_f/zcly_6490514rj6wnsjfl2z80000gn/T/science-gates-current-e4uum1oo",
+      "returncode": 0,
+      "stdout": "usage: report.py [-h] [--root ROOT] --source-sha256 SOURCE_SHA256 --contract\n                 CONTRACT --contract-sha256 CONTRACT_SHA256 --html HTML\n                 [--out OUT]\n                 {render,check} source\n\nRender/check a bounded, offline scientific report; never decide scientific\nPASS.\n\npositional arguments:\n  {render,check}\n  source\n\noptions:\n  -h, --help            show this help message and exit\n  --root ROOT\n  --source-sha256 SOURCE_SHA256\n  --contract CONTRACT\n  --contract-sha256 CONTRACT_SHA256\n  --html HTML\n  --out OUT\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "/Users/liuyangfan/.local/bin/python3.11",
+        "-B",
+        "/private/var/folders/_f/zcly_6490514rj6wnsjfl2z80000gn/T/science-gates-current-e4uum1oo/skill copy/scripts/prepare.py",
+        "--help"
+      ],
+      "cwd": "/private/var/folders/_f/zcly_6490514rj6wnsjfl2z80000gn/T/science-gates-current-e4uum1oo",
+      "returncode": 0,
+      "stdout": "usage: prepare.py [-h] [--root ROOT] --out OUT {refs,fill} paths [paths ...]\n\nGenerate small-file references or fill explicit null digests in a NEW draft.\n\npositional arguments:\n  {refs,fill}\n  paths        explicit files, or exactly one draft JSON for fill\n\noptions:\n  -h, --help   show this help message and exit\n  --root ROOT\n  --out OUT\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "/Users/liuyangfan/.local/bin/python3.11",
+        "-B",
+        "/private/var/folders/_f/zcly_6490514rj6wnsjfl2z80000gn/T/science-gates-current-e4uum1oo/skill copy/scripts/g_decision_coverage.py",
+        "--help"
+      ],
+      "cwd": "/private/var/folders/_f/zcly_6490514rj6wnsjfl2z80000gn/T/science-gates-current-e4uum1oo",
+      "returncode": 0,
+      "stdout": "usage: g_decision_coverage.py [-h] --upstream UPSTREAM [UPSTREAM ...]\n                              --downstream DOWNSTREAM --decided-pattern\n                              DECIDED_PATTERN\n                              [--superseded-pattern SUPERSEDED_PATTERN]\n                              [--retired-pattern RETIRED_PATTERN]\n                              [--open-pattern OPEN_PATTERN] --landing-pattern\n                              LANDING_PATTERN\n                              [--landing-section LANDING_SECTION]\n                              [--landing-section-none]\n                              [--require-counts REQUIRE_COUNTS]\n\n上游决策覆盖（SCI 门 A 预检）\n\noptions:\n  -h, --help            show this help message and exit\n  --upstream UPSTREAM [UPSTREAM ...]\n                        上游决策文档，可多份 —— 工程链常有设计稿 / 详细合同 / 决策 draft /\n                        对话文档多个上游。多份时取并集，「每编号恰好一个当前状态」因此能跨文件生效：A 文件标已拍板、B\n                        文件标已推翻 → STATUS_CONFLICT（跨文件撤销未回写的典型形态）\n  --downstream DOWNSTREAM\n                        下游 spec\n  --decided-pattern DECIDED_PATTERN\n                        上游『已拍板』编号正则（含一个捕获组）\n  --superseded-pattern SUPERSEDED_PATTERN\n                        上游『被推翻』编号正则（不得落表）\n  --retired-pattern RETIRED_PATTERN\n                        上游『已登记为无对象』编号正则（允许且应当落表）\n  --open-pattern OPEN_PATTERN\n                        上游『待定 / 未决』编号正则（不得落表）\n  --landing-pattern LANDING_PATTERN\n                        下游落点表编号正则（含一个捕获组）\n  --landing-section LANDING_SECTION\n                        只在下游该节内取落点（正则，到下一同级标题为止）\n  --landing-section-none\n                        显式声明本 spec 无落点节，作用域取全文 —— 与 --landing-section\n                        二选一，必须显式给其一：省略时作用域悄悄变成全文，「正文里顺口提及的编号」会被算成已落地，正好遮蔽 A1\n                        的「漏落地 → BLOCKER」\n  --require-counts REQUIRE_COUNTS\n                        对上游实算数的显式断言，如 decided=27,open=0；键取\n                        decided/superseded/retired/open/landed。不等即 FAIL ——\n                        正则写窄会静默少捞编号，双向差集照样为空判 PASS，这是唯一能发现它的手段\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "/Users/liuyangfan/.local/bin/python3.11",
+        "-B",
+        "/private/var/folders/_f/zcly_6490514rj6wnsjfl2z80000gn/T/science-gates-current-e4uum1oo/skill copy/scripts/verify_digests.py",
+        "--help"
+      ],
+      "cwd": "/private/var/folders/_f/zcly_6490514rj6wnsjfl2z80000gn/T/science-gates-current-e4uum1oo",
+      "returncode": 0,
+      "stdout": "usage: verify_digests.py [-h] {check,write,snapshot} ...\n\nSCI 核验：表列内容身份与显式目录巡检分离。 退出码沿用 0 PASS / 1 FAIL / 2 TOOL_ERROR / 3\nNOT_VERIFIABLE。 运行位置：待核项目的仓库根目录。仅 write/snapshot 写指定目标。\n\npositional arguments:\n  {check,write,snapshot}\n\noptions:\n  -h, --help            show this help message and exit\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "/Users/liuyangfan/.local/bin/python3.11",
+        "-B",
+        "/private/var/folders/_f/zcly_6490514rj6wnsjfl2z80000gn/T/science-gates-current-e4uum1oo/skill copy/scripts/workflow.py",
+        "--help"
+      ],
+      "cwd": "/private/var/folders/_f/zcly_6490514rj6wnsjfl2z80000gn/T/science-gates-current-e4uum1oo",
+      "returncode": 0,
+      "stdout": "usage: workflow.py [-h] [--root ROOT] --manifest-sha256 MANIFEST_SHA256\n                   --contract-sha256 CONTRACT_SHA256 [--out OUT]\n                   [--commit COMMIT] [--step STEP] [--receipt-dir RECEIPT_DIR]\n                   [--review REVIEW] [--review-sha256 REVIEW_SHA256]\n                   {render,check,run,record} manifest\n\nSCI workflow facts and candidate records; never a scientific Reviewer. All\ncontrol inputs are externally SHA-pinned. The acceptance source independently\ndefines the complete check-ID set. Digest and snapshot checks use the bundled\ncurrent backend.\n\npositional arguments:\n  {render,check,run,record}\n  manifest\n\noptions:\n  -h, --help            show this help message and exit\n  --root ROOT\n  --manifest-sha256 MANIFEST_SHA256\n  --contract-sha256 CONTRACT_SHA256\n  --out OUT\n  --commit COMMIT\n  --step STEP\n  --receipt-dir RECEIPT_DIR\n  --review REVIEW\n  --review-sha256 REVIEW_SHA256\n",
+      "stderr": ""
+    }
+  ]
 }

@@ -4,13 +4,14 @@
 
 运行依赖为 Python 3.10+ 标准库，以及只读的：
 
-- `scripts/agent_gates_v2/verify_digests.py`
-- `scripts/agent_gates_v2/snapshots.py`
-- v2 实际导入的 `scripts/agent_gates/verify_digests.py`
+- `scripts/workflow.py`
+- `scripts/verify_digests.py`
+- `scripts/snapshots.py`
+- `scripts/digest_table.py`
 
-当前工作流必须把实际工具依赖列入对象表。合同可用 `required_paths` 强制这些路径齐全；它们的具体版本由本轮 manifest SHA 和派发表绑定。旧工具不因被新入口调用而获得修改许可。
+当前工作流必须把实际工具依赖列入对象表。合同可用 `required_paths` 强制这些路径齐全；它们的具体版本由本轮 manifest SHA 和派发表绑定。scripts/ 中只有这套当前实现；历史版本保存在 Git。已冻结链不会因本包升级而自动获得改用新字节的许可。
 
-新入口对 `.jsonl/.ndjson` 科学记录作局部识别适配：在旧后端同次内容读取的 bytes 上逐行检查，允许多个普通 JSON 对象，不把它们误解析为快照。空表、非法行、重复键、超过 32 MiB 或任一行伪装为快照均失败；不能靠改后缀绕过快照计划。适配只作用于本次加载的模块实例，冻结的旧源码不变。
+工作流对 `.jsonl/.ndjson` 科学记录作局部识别适配：在摘要后端同次内容读取的 bytes 上逐行检查，允许多个普通 JSON 对象，不把它们误解析为快照。空表、非法行、重复键、超过 32 MiB 或任一行伪装为快照均失败；不能靠改后缀绕过快照计划。适配只作用于本次加载的模块实例，不修改共享模块的全局行为。
 
 ## 信任起点与最少文件
 
@@ -50,7 +51,7 @@
   "allowed_hosts": ["local", "compute_host"],
   "write_roots": ["reviews/repair/attempt_001"],
   "forbidden_paths": ["protected/history"],
-  "required_paths": ["scripts/agent_gates_v3/workflow.py"],
+  "required_paths": ["scripts/workflow.py"],
   "actors": {
     "coordinator": "<actual-coordinator-id>",
     "implementer": "<actual-implementer-id>",
@@ -110,7 +111,7 @@
 
 可选字段：
 
-- `snapshot_plan`：一个 present 对象 ID，指向已有 `agent-gates.snapshot-plan.v2`。所有被列出的快照必须恰好被计划覆盖。先认证计划和基线的同一份 bytes、预检全部扫描范围，再启动普通对象哈希及目录巡检；基线与 v2 同次内容摘要解析值再次比较，不按可变路径重读来决定扫描目标。本地 target 必须为仓库内绝对路径，避免进程 cwd 改变扫描面。
+- `snapshot_plan`：一个 present 对象 ID，指向已有 `agent-gates.snapshot-plan.v2`。所有被列出的快照必须恰好被计划覆盖。先认证计划和基线的同一份 bytes、预检全部扫描范围，再启动普通对象哈希及目录巡检；基线与摘要后端同次内容摘要解析值再次比较，不按可变路径重读来决定扫描目标。本地 target 必须为仓库内绝对路径，避免进程 cwd 改变扫描面。
 - `history`：`[{"gate":"B","stage":"c1","report":{"path":"...","sha256":"..."}}]`。引用原报告，不能改旧报告或仅改轮次文本。
 - `execution_permit`：门 B 已认证执行前独立审查 JSON 的 `{path,sha256}`。门 B 科学执行与结果候选记录必须验证它；其 `object_sha256` 要覆盖实际执行输入的 ID、路径与 SHA。许可还必须带 `manifest_path/manifest_sha256`，绑定原 manifest，并通过与 record 相同的完整独立报告、派发、覆盖和 finding 核验；只写 PASS、空 checks、OPEN BLOCKER 或伪造原 manifest 都失败。历史 planned 产物现已存在不妨碍复核许可，但不因此获得覆盖权限。
 - `acceptance[].receipts`：本次要核的 receipt 对象 ID。使用时须同时列出 receipt 的原 manifest、原始 stdout/stderr 和输入/输出对象，并绑定各自 SHA。
@@ -135,7 +136,7 @@
 
 `contract.protected` 可列 `id/path/policy/evidence_refs`；policy 为 `frozen/candidate_diff/new_attempt`，`evidence_refs` 为冻结的基线或授权 `{path,sha256}` 数组。manifest 的 `protection` 逐项给出 `id/policy/evidence:[对象ID]`，不得漏项、改变 policy、替换冻结锚的路径或 SHA。
 
-该表检查证据覆盖和锚身份，不自动宣称候选 diff 的科学含义或整个目录内容未变。实际目录断言仍由显式 v2 巡检计划实施，候选写入范围仍须与冻结授权及固定 Git diff 独立核对；新 attempt 的产物仍须不覆盖。工具不刷新基线，也不把历史 metadata 当作内容证明。
+该表检查证据覆盖和锚身份，不自动宣称候选 diff 的科学含义或整个目录内容未变。实际目录断言仍由显式巡检计划实施，候选写入范围仍须与冻结授权及固定 Git diff 独立核对；新 attempt 的产物仍须不覆盖。工具不刷新基线，也不把历史 metadata 当作内容证明。
 
 活动快照的扫描根不能位于禁止子树内，也不能成为其祖先；本地路径同时核词面和解析后的链接落点。即使 baseline 声明 exclude 也静态拒绝祖先重叠，不把 glob 当越界授权。metadata 虽不读普通文件内容，仍枚举名称和属性，遵守相同限制。history 只核基线字节，不遍历历史 target，因此不会补造旧目录事实。若远端主机声明了禁止路径，当前薄层拒绝在该主机进行任何活动快照：静态检查不能排除远端祖先链接别名；应使用明确的小文件清单或单独获批的核验方案，不能静默穿越禁止面。
 
@@ -167,7 +168,7 @@ python3 /absolute/path/to/science-gates/scripts/science.py record reviews/stage.
 
 `render` 只生成确定性派发，不声称对象内容已核。`check` 返回 `MECHANICAL_OK`，明确不等于科学 PASS。存在明确的结构、host、路径、缺文件、重复输出或创建归属错误时，先失败再停止内容核验。`--commit` 只接受完整固定 commit，并核 manifest/合同/源目录/授权及声明 Git 保全对象的 blob；不提供 commit 时只核当前身份和本地保全映射，不证明已提交。
 
-`run` 首版只执行本地单条 argv，不提交或包装远端作业。远端既有产物可由 v2 按显式清单只读核 SHA；现有调度证据通过经审查的科学验收器消费，不伪造成 v3 receipt。`scoped_addendum` 禁止 `scientific` kind，科学执行还须满足阶段与独立执行前 PASS。run 独占新 receipt 目录，生成不可覆盖的 `start.json/stdout.bin/stderr.bin/receipt.json`；保存原始 argv/cwd/host/hostname/时间/原命令退出码及对象绑定。失败原码向调用者传播；信号退出使用 `128+signal`；命令为 0 但产物缺失或身份变化时工具非零。原始日志不截断，不删失败 receipt。
+`run` 当前只执行本地单条 argv，不提交或包装远端作业。远端既有产物可由摘要后端按显式清单只读核 SHA；现有调度证据通过经审查的科学验收器消费，不伪造成当前 run 的 receipt。`scoped_addendum` 禁止 `scientific` kind，科学执行还须满足阶段与独立执行前 PASS。run 独占新 receipt 目录，生成不可覆盖的 `start.json/stdout.bin/stderr.bin/receipt.json`；保存原始 argv/cwd/host/hostname/时间/原命令退出码及对象绑定。失败原码向调用者传播；信号退出使用 `128+signal`；命令为 0 但产物缺失或身份变化时工具非零。原始日志不截断，不删失败 receipt。
 
 工具会在执行前后核本次显式输入身份，但不是文件系统沙箱：命令是否暗读暗写、输出创建的并发竞争及真实科学边界仍需代码审查与显式保护证据。receipt 由执行方可写，因此不是独立可信的调度器锚；科学复算/独立锚要求仍保留。
 
@@ -202,12 +203,12 @@ actor ID 与外部报告 SHA 由调度者/用户从真实独立会话提供。�
 
 ## 限额、错误与测试
 
-manifest、合同、源目录、报告及 receipt 控制读取上限为 8 MiB；拒绝重复 JSON key、未知 schema/key、非规范路径和控制文件 symlink。解析直接消费已核 SHA 的同一份 bytes，并检查读取前后状态。v2 内容核验的对象形 JSON 限额仍为其原有 32 MiB。没有跨调用 SHA 缓存；目录采集和普通文件检查都不是原子文件系统快照。
+manifest、合同、源目录、报告及 receipt 控制读取上限为 8 MiB；拒绝重复 JSON key、未知 schema/key、非规范路径和控制文件 symlink。解析直接消费已核 SHA 的同一份 bytes，并检查读取前后状态。摘要核验的对象形 JSON 限额为 32 MiB。没有跨调用 SHA 缓存；目录采集和普通文件检查都不是原子文件系统快照。
 
 机械退出码为 `0` 成功、`1` 身份/完整性失败、`2` 工具故障、`3` 不可核验；`run` 的非零子进程码直接传播。使用 `tee` 时仍须 `pipefail`。所有输出路径要求父目录已经存在、目标不存在；不自动清理或覆盖旧结果。
 
 ```bash
-python3 -B -m unittest discover -s scripts/agent_gates_v3 -p 'test_*.py' -v
+python3 -B scripts/run_tests.py
 ```
 
 测试只用 `/tmp` 中的小文件，覆盖独立必需集合、空表/空证据、NA 权限、源与当前对象身份、禁止路径/链接及祖先快照、创建归属、错误传播、原始 receipt 绑定、完整 finding、门别混用、许可空壳、预算回退和保护锚不可刷新。禁止子树反例使用普通 `.dat` 文件，不读取项目报告；不连接真实远端，不执行科学分析。

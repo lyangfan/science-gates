@@ -24,5 +24,8 @@ demo.html，可直接离线打开。示例数值不是真实科学结论。
 最终放行需要固定对象、独立审查及入库记录。报告校验可发现缺项、错源和渲染漂移，
 结论是否由证据支持仍须科学审查。
 
-原有通用脚本的来源与原始摘要见 [source-provenance.json](references/source-provenance.json)。
+scripts/ 下仅保留一套当前实现，测试集中在 scripts/tests/；历史实现留在 Git，
+不维护 v2/v3 并行目录。文件中的 schema 版本号只标识数据格式。
+
+通用脚本的来源、原始摘要与整合映射见 [source-provenance.json](references/source-provenance.json)。
 版本固定与迁移规则见 [SCI 协议](references/protocol.md)。

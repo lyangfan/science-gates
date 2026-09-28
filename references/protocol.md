@@ -1,4 +1,4 @@
-# SCI PROTOCOL v11.0-sci（science-gates 1.0.0）
+# SCI PROTOCOL v11.0-sci（science-gates 1.0.1）
 
 > 门 A 冻结可执行的科学合同；门 B 实现、验证并由独立审查建立结论。严格约束科学语义，工程动作在明确授权内自主处理。机器核验通过不等于科学 PASS。
 
@@ -132,14 +132,14 @@ finding 包含 `id/check/severity/location/excerpt/authority/counterexample/clos
 - 可流式处理的大输入在同次读取中完成内容摘要与科学检查；证据记录所消费字节及 EOF 完成情况。Reviewer 独立复核使用其自己的实测证据，不能把执行者自报摘要当独立复算。
 - 同次调用可去重相同对象；没有可信不可变保障时不跨运行继承旧内容核验。大小/时间相同不证明内容相同。
 - content 与 metadata 快照显式区分。metadata 只检查路径、类型、大小、时间、权限和链接目标，不读普通文件内容，也不证明字节相同。旧快照、迁移前后边界与已知差异保留。
-- 纯禁写目录使用 v2 显式巡检计划。混合目录的保护策略来自冻结授权：历史文件修改/删除失败；获准候选只接受对应 diff 和新字节；允许新 attempt 的路径必须原先不存在、独占创建且未覆盖历史。新增权限不能吸收未解释的既有差异。
+- 纯禁写目录使用显式巡检计划。混合目录的保护策略来自冻结授权：历史文件修改/删除失败；获准候选只接受对应 diff 和新字节；允许新 attempt 的路径必须原先不存在、独占创建且未覆盖历史。新增权限不能吸收未解释的既有差异。
 - 禁止发现差异后刷新基线消除红灯。范围、排除条件、主机和路径都必须进入计划，检查前认证计划与基线字节；用同一份认证内容进行解析，避免再次按路径读取替换内容。
 
-包内保留 v1/v2/v3 依赖及回归测试；新链由 science.py 加载。原项目的冻结脚本、spec 与报告不改写；任何调用的实际依赖均须登记。
+包内仅保留一套当前实现及回归测试，按功能分模块；历史实现由 Git 保留，新链由 science.py 加载。原项目的冻结脚本、spec 与报告不改写；任何调用的实际依赖均须登记。
 
 ## §8 工件与工具
 
-统一入口：`scripts/science.py`；schema 见 workflow-schema.md。底层复用 `scripts/agent_gates_v3/workflow.py`、v2 摘要与快照、v1 解析及 Git 核验。新链不能直接绕过统一入口的报告合同检查。
+统一入口：`scripts/science.py`；schema 见 workflow-schema.md。底层由 `scripts/workflow.py`、`scripts/verify_digests.py`、`scripts/snapshots.py` 和 `scripts/digest_table.py` 分别处理工作流、摘要核验、目录巡检及表格/Git 解析。新链不能直接绕过统一入口的报告合同检查。
 
 | 工件 | 内容与规则 |
 |---|---|
