@@ -1,0 +1,62 @@
+{
+  "kind": "author_validation",
+  "independent_scientific_pass": false,
+  "python": "3.11.14",
+  "test_suites": {
+    "legacy": 40,
+    "digests_and_snapshots": 62,
+    "workflow": 61,
+    "science_report_and_integration": 45
+  },
+  "tests_passed": 208,
+  "final_report_suite": "validation/tests-final-report.txt",
+  "full_suite_log": "validation/test-output.txt",
+  "source_files_unchanged": 12,
+  "broken_document_links": [],
+  "artifact_sha256": {
+    "SKILL.md": "693bd29ad2b3450632afe641a0f69c2c17cdb9d4ac7156259676b2c2017b20cb",
+    "README.md": "d9c9f8c842925cf1f430d8428752a21329fda8a956d781082ad23e6fc0d4c6da",
+    "VERSION": "59854984853104df5c353e2f681a15fc7924742f9a2e468c29af248dce45ce03",
+    "assets/report.html": "d77627a0658dc868791b5a09719c9a46e0ad302a159b96c879a891551f49c99f",
+    "agents/openai.yaml": "42deb24784d8350675a5e179d92c1cea3e75e2378dd935bdc35df849b12a8f84",
+    "scripts/agent_gates/g_decision_coverage.py": "939ba9f077c24ebd4a1fbd3d16e1f8fddcb1b6c7a0fb25ab47a718950f11288f",
+    "scripts/agent_gates/test_verify_digests.py": "84c4a0e57d19a4a96fb9cf077d4fc57d6b5e9685f3fee8f321aab74de2c68593",
+    "scripts/agent_gates/verify_digests.py": "469c0c9b7774cb8d7cb64d3206db12953070b7248ed55d74d6a37dfc3565b11c",
+    "scripts/agent_gates_v2/snapshots.py": "c6622ad092d9045a7977c7579d594ac4566332b7eccae81a5536874557ce7a29",
+    "scripts/agent_gates_v2/test_snapshots.py": "876c9012e078eb65be91985259cd666163b5e72c173d5aec8b6a9dbe931e4072",
+    "scripts/agent_gates_v2/test_verify_digests.py": "64068722453dd798ee04cb39f6ac949e283b1d8cd226afce772f10c733792106",
+    "scripts/agent_gates_v2/verify_digests.py": "39df6e4338d4d12f22b95ae0d7277d5f2899b860bf4953bf77b0706a4d55e6e8",
+    "scripts/agent_gates_v3/test_workflow.py": "d4a7b21fa03598f5dd44c2420f1aa10d2fb1ca3e9313f3962b474f09af5d3ec9",
+    "scripts/agent_gates_v3/workflow.py": "6af2308ff49c2f1c4130d87da3b819774c9fd2eac05e26465797bdb78e77bc9c",
+    "scripts/make_example.py": "40ab3fbb5edc7736d2f26ffaf7c6f4aa8980c843a84d5497249646c89dfe4bb9",
+    "scripts/prepare.py": "f6ca60ade039aca1f475a1165479b2d9dbe5fb86675208215250cd3e8bf8687b",
+    "scripts/report.py": "95c5609706a2cb23e0ed9f4b73cb04bb90bcfef2f6f632a7159f18eaf9d371f8",
+    "scripts/run_tests.py": "2186ea38d98ef3cb2f88b7742d87da9c729f980401539e9a9942c050c628708b",
+    "scripts/science.py": "7a1b045b00aab0cc76dd5913f90ce53af957e48f5fa3a198e91ec30007adac08",
+    "scripts/tests/test_science_skill.py": "98a2a32b470f659092cc0f4ea94383ab9c175c4f1b7821c5756682869481b8fe",
+    "references/digests-and-snapshots.md": "5d5cb4700e611addcdf322e00e91b9f34d2054b46b5f474488ba4c885675a392",
+    "references/gate-a.md": "01b7ff3b200142c26646b13f7bda7290dadfac4ac5134a45448ad1d094a119e9",
+    "references/gate-b.md": "31c593562f5a8950e1cafa2b3f4eaf46225f1350724feca5386d279c3272933a",
+    "references/project-setup.md": "300c2dff5c4edbaa081122a2c111ccddb2cfca699f7e9251c8745f2592b2aceb",
+    "references/protocol.md": "7f87aa62dfc16c1785de2468c1cc19cb772018e638c3b327bafa425d32a8a884",
+    "references/report.md": "a861a0fc39b20bdec0fa383556aeb3acae9556714ff4e0cd1f850a07ec3bb4f1",
+    "references/source-provenance.json": "2053adcce304297c57bb462cda632942a09c414c209c1d6a440aaa9857becffa",
+    "references/workflow-schema.md": "dedd9a6c296a5d9df3a15fc46c0481c6ef569b1f0723f5ea80082eb816c70ac1"
+  },
+  "browser": {
+    "desktop_viewport": [
+      1280,
+      900
+    ],
+    "mobile_viewport": [
+      390,
+      844
+    ],
+    "mobile_body_width": 390,
+    "broken_anchors": [],
+    "screenshots": {
+      "output/playwright/desktop-release.png": "c4c0908cdc2bcc4f14db46c945ea869c37ab56db6f132f2a962e4ec4954cfadb",
+      "output/playwright/mobile-release.png": "6823a3553a5d5db0ea1d8c18038a6eec483d4b6d09dcfc1fd455c00e9d51a479"
+    }
+  }
+}

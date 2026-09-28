@@ -1,0 +1,6 @@
+### Result
+"{\"viewport\":390,\"bodyWidth\":390,\"scrollHint\":\"block\",\"figureScrollable\":true,\"brokenAnchors\":[]}"
+### Ran Playwright code
+```js
+await page.evaluate('() => (JSON.stringify({viewport:innerWidth,bodyWidth:document.body.scrollWidth,scrollHint:getComputedStyle(document.querySelector(".scroll-hint")).display,figureScrollable:document.querySelector("figure").scrollWidth>document.querySelector("figure").clientWidth,brokenAnchors:Array.from(document.querySelectorAll("a[href^=\'#\']")).filter(a=>!document.getElementById(a.hash.slice(1))).map(a=>a.hash)}))');
+```

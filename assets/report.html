@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="light">
+<link rel="icon" href="data:,">
+<title>@@TITLE@@</title>
+<style>
+:root{--ink:#172d3c;--muted:#536773;--accent:#067a74;--paper:#f4f7f8;--line:#d9e3e7}
+*{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:24px}
+body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.8 system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif}
+main{max-width:1180px;margin:auto;padding:48px 28px}header{border-top:7px solid var(--accent);padding:36px;background:white;border-radius:4px 4px 20px 20px}
+.eyebrow{font-size:13px;letter-spacing:.15em;font-weight:700;color:var(--accent)}h1{font-size:clamp(28px,4vw,46px);line-height:1.3;margin:12px 0 22px}h2{font-size:28px;line-height:1.4;margin:14px 0 28px}h3{font-size:18px;margin:28px 0 10px}h4{font-size:17px;margin:0 0 16px}
+p,li{max-width:86ch}p{white-space:pre-line}.lead{font-size:18px;color:var(--muted)}.summary{background:#e9f5f1;padding:22px 26px;border-left:4px solid var(--accent);margin-top:28px}
+nav{display:flex;gap:10px;flex-wrap:wrap;margin:26px 0}nav a{background:white;border:1px solid var(--line);padding:8px 15px;border-radius:24px;text-decoration:none}
+a{color:#066b77;text-underline-offset:3px}a:focus-visible,summary:focus-visible{outline:3px solid #d97d32;outline-offset:4px}
+.analysis{background:white;border:1px solid var(--line);border-radius:18px;padding:34px;margin:26px 0}.section-head{display:flex;align-items:center;justify-content:space-between}.state{font-size:13px;padding:3px 12px;background:#eef4f6;border-radius:20px;color:var(--muted)}
+.metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:15px;margin:18px 0 28px}.metric{background:#f3f8f8;padding:20px;border:1px solid #e0eceb;border-radius:12px;min-width:0}.metric>span{display:block;font-size:14px;color:var(--muted)}.metric strong{display:block;font-size:30px;line-height:1.4;margin:8px 0;overflow-wrap:anywhere}.metric small{font-size:14px;font-weight:400}.metric a{font-size:12px;overflow-wrap:anywhere}
+figure{margin:24px 0;padding:22px;border:1px solid var(--line);border-radius:12px}svg{display:block;width:100%;height:auto;min-width:440px}figure:has(svg){overflow-x:auto}.grid{stroke:#e3ebee;stroke-width:1}.axis{stroke:#6b7c85;stroke-width:1.4}.tick{font:13px system-ui;fill:#526571}.axis-label{font:15px system-ui;fill:#263d49}.bar{fill:#148a83}.point{fill:#126d95;opacity:.76}
+img{display:block;max-width:100%;height:auto}figcaption{font-size:14px;color:var(--muted);margin-top:16px;max-width:85ch}.table-scroll{overflow:auto;max-height:580px;border:1px solid var(--line);border-radius:8px}table{width:100%;border-collapse:collapse;font-size:14px}th,td{padding:10px 14px;text-align:left;border-bottom:1px solid var(--line);white-space:nowrap}th{background:#eef5f6;position:sticky;top:0}tr:nth-child(even){background:#f8fafb}details{margin:18px 0}summary{cursor:pointer;font-weight:600}details .table-scroll{margin-top:14px}
+.notice{background:#fff5e3;padding:16px 20px;border-radius:8px}.evidence{font-size:13px;color:var(--muted)}.provenance{padding:24px 32px;border-top:1px solid var(--line);color:var(--muted)}code{overflow-wrap:anywhere}.digest{font:12px/1.8 ui-monospace,monospace;overflow-wrap:anywhere}footer{font-size:13px;color:var(--muted);padding:20px 0}.scroll-hint{display:none;color:var(--muted);font-size:13px}figure:focus-visible{outline:3px solid #d97d32;outline-offset:4px}
+@media(max-width:650px){main{padding:20px 12px}header,.analysis{padding:24px 18px}figure{padding:14px}.metrics{grid-template-columns:1fr}.provenance{padding:20px 14px}.scroll-hint{display:block}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+@media print{body{background:white}main{max-width:none;padding:0}nav{display:none}.analysis{break-before:auto;box-shadow:none}.metric,figure{break-inside:avoid}.table-scroll{overflow:visible;max-height:none}details{display:block}svg{min-width:0}.provenance{break-before:page}}
+</style>
+</head>
+<body>
+<main>
+<header><div class="eyebrow">SCIENCE · EXPERIMENT REPORT</div><h1>@@TITLE@@</h1><p class="lead">@@OVERVIEW@@</p><div class="summary"><strong>主要发现</strong><p>@@SUMMARY@@</p></div></header>
+<nav aria-label="分析导航">@@NAV@@</nav>
+@@ANALYSES@@
+<details class="provenance"><summary>数据来源与复现定位</summary>@@PROVENANCE@@</details>
+<footer>科学结论以本报告所列样本、方法与证据范围为限。报告生成及机械校验本身不构成独立科学验收。</footer>
+</main>
+</body>
+</html>

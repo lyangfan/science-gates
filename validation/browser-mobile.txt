@@ -1,0 +1,6 @@
+### Result
+"{\"viewport\":390,\"bodyWidth\":390,\"openDetails\":[true,true],\"rows\":[2,6],\"brokenAnchors\":[]}"
+### Ran Playwright code
+```js
+await page.evaluate('() => (JSON.stringify({viewport:innerWidth,bodyWidth:document.body.scrollWidth,openDetails:Array.from(document.querySelectorAll("details"),d=>d.open),rows:Array.from(document.querySelectorAll("table tbody"),t=>t.rows.length),brokenAnchors:Array.from(document.querySelectorAll("a[href^=\'#\']")).filter(a=>!document.getElementById(a.hash.slice(1))).map(a=>a.hash)}))');
+```

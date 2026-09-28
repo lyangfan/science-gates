@@ -1,0 +1,4 @@
+interface:
+  display_name: "Science Gates"
+  short_description: "科学 spec 的门 A、实施验收与可追溯 HTML 实验报告"
+  default_prompt: "使用 $science-gates，把当前科学任务整理为可执行合同，按所处阶段实施或独立审查，并交付完整的 HTML 科学报告。"

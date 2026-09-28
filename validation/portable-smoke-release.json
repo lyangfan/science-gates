@@ -1,0 +1,19 @@
+{
+  "argv": [
+    "python3.11",
+    "-B",
+    "/Users/liuyangfan/Documents/work/science-gates/scripts/science.py",
+    "check",
+    "reviews/stage.json",
+    "--root",
+    "/tmp/science-gates-demo-20260928/release",
+    "--manifest-sha256",
+    "540e864a62ed40fbd24f9ac664b15eaf855e5a768c452ecc7b97dfab5ef90f5a",
+    "--contract-sha256",
+    "d259671abbf32da0ce970dc196767c152708bdeb80a5fe2643c8f94b8206b34c"
+  ],
+  "cwd": "/tmp",
+  "returncode": 0,
+  "stdout": "{\"result\": \"MECHANICAL_OK\", \"scientific_pass\": false, \"stage\": \"addendum\", \"scope\": \"scoped_addendum\", \"report\": {\"schema\": \"science-gates.report-check.v1\", \"status\": \"MECHANICAL_OK\", \"scientific_pass\": false, \"source\": {\"path\": \"report-source.json\", \"sha256\": \"72a4b471361bfe83e3ecb0b62aacd2d14d4a7f0270608f9957c1362164587949\"}, \"contract\": {\"path\": \"reviews/report-contract.json\", \"sha256\": \"603ff396bf86cf3f8fd62aea0fee5f0f9f4a71137d9f4c0b4c802555aa595518\"}, \"html\": {\"path\": \"demo.html\", \"sha256\": \"60dad681b187f9dbcbfa206b510f0293fde6d846d82bf0d6dffbe7f46a8a83b7\"}, \"template_sha256\": \"d77627a0658dc868791b5a09719c9a46e0ad302a159b96c879a891551f49c99f\", \"analyses\": [{\"id\": \"EXP1\", \"status\": \"completed\"}], \"required_independent_checks\": [\"RPT-COVERAGE\", \"RPT-METHODS\", \"RPT-RESULTS\", \"RPT-VISUALS\", \"RPT-CONCLUSIONS\", \"RPT-PROVENANCE\"], \"stats\": {\"source_files\": 2, \"source_bytes\": 114, \"rows\": 8, \"control_bytes\": 3750, \"elapsed_seconds\": 0.000918}}, \"stats\": {\"content_files\": 6, \"content_bytes\": 15020, \"cache_hits\": 0, \"git_blobs\": 0, \"git_blob_bytes\": 0}}\n",
+  "stderr": ""
+}
